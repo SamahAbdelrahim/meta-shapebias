@@ -242,6 +242,12 @@ ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= agegroup)) +
 
 
 ```
+``` {r}
+m.gen$data %>%
+  mutate(y = m.gen$TE/m.gen$seTE, x = 1/m.gen$seTE) %>%
+  lm(y ~ x, data= .) %>%
+  summary()
+```
 using rma.mv instead of m.gen
 ```{r }
 mod <- rma.mv(yi = d, 
