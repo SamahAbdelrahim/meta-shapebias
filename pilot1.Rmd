@@ -1,0 +1,344 @@
+---
+title: "pilot1"
+author: "Samah"
+date: "2023-03-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# uncomment below to render to html
+# output:
+#   bookdown::html_document2:
+#     toc: true
+#     toc_depth: 4
+#     theme: cosmo
+#     highlight: tango
+    
+# uncomment below to render to pdf
+output:
+  bookdown::pdf_book:
+    toc: true
+    toc_depth: 4
+    highlight: tango
+    
+bibliography: [references/packages.bib, references/references.bib]
+biblio-style: apalike
+nocite: '@*'
+---
+
+```{r setup, echo=FALSE, message=FALSE}
+library("knitr") # for knitting things
+library("tidyverse") # for all things tidyverse
+
+# these options here change the formatting of how comments are rendered
+opts_chunk$set(
+  comment = "",
+  results = "hold",
+  fig.show = "hold")
+
+# set the default ggplot theme 
+theme_set(theme_classic())
+
+# include references for used packages
+write_bib(.packages(), "references/packages.bib") 
+```
+
+# Results
+``` {r}
+# additional libraries
+library("knitr")
+library("janitor")     
+library("broom.mixed") 
+library("lme4")
+library("emmeans")
+library("tidyverse")
+library("kableExtra")
+library("modelr")
+library("broom")
+library("nlme")
+library("meta")
+library("metafor")
+theme_set(theme_classic())
+```
+
+```{r}
+# reading the data file
+pilot1_data = read_csv("252.csv")
+
+# pilot1_data = pilot1_data %>%
+#   select(ID, Title, d, d_var, Author)
+
+pilot1_data_summary = pilot1_data %>% 
+  group_by(ID, Title, Author) %>%
+  summarize(mean = mean(d), 
+            mean_se = mean(d_var))
+  
+```
+
+First, Visualizing the data to have an initial idea of how it looks.
+First dividing the language group into two groups: the first one is the indo-european group which includes the English and the Spanish languages. The second group includes the rest of the languages: Japanese, Chinese, Tsimane.
+
+``` {r}
+
+pilot1_data$indoeuropean <- fct_relevel(as.factor(pilot1_data$language %in% 
+                                          c("english","spanish", "german")), 
+                                        "TRUE")
+
+# creating a plot that shows the effects sizes colored per language group as well as the polynomial regression curve that fits it. 
+
+ggplot(pilot1_data,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5) + 
+  geom_smooth(aes(group = indoeuropean, 
+                  lty  = indoeuropean), 
+              col = "black",
+              method = "lm", se = FALSE,
+              formula = y ~ poly(x,2)) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom")
+
+ggsave("first graph.png", width = 7, height = 4)
+```
+
+Starting with all effect sizes without pooling them per paper: In the original dataset, i have multiple effect sizes per paper. So at first i tried to create a forest graph that contains all of the effect sizes without grouping them by paper. 
+Note: A forest plot is a graph that provides a graphical display of the observed effect, confidence interval, and usually also the weight of each study. They also display the pooled effect we have calculated in a meta-analysis. 
+``` {r}
+m.gen <- metagen( TE= d, 
+                  seTE = d_var, 
+                  studlab = ID, 
+                  data = pilot1_data[-9,], 
+                  sm = "SMD", 
+                  fixed = FALSE, 
+                  random = TRUE, 
+                  method.tau = "REML", 
+                  hakn = TRUE, 
+                  title = "pilot shape bias meta-analysis"
+ 
+)
+
+# forest.meta(m.gen, 
+#             sortvar = TE, 
+#             prediction = TRUE, 
+#             print.tau2 = FALSE, 
+#             leftlabs = c("Author", "g", "SE"))
+```
+
+```{r }
+mod <- rma.mv(yi = d, 
+                  V = d_var, 
+                  random = ~ 1 | ID,
+                  slab = short_cite, 
+                  data = filter(pilot1_data, 
+                                !is.na(d)))
+forest(mod) 
+forest_data <-tibble(yi = mod$yi,
+                     se = sqrt(mod$vi), 
+                     slab = mod$slab)
+
+ggplot(forest_data, 
+       aes(x = slab, y = yi)) +
+  geom_pointrange(aes(ymin = yi - se, ymax = yi + se)) + 
+  geom_hline(yintercept = 0, lty = 2) +
+  coord_flip() 
+
+
+# 
+# theme_set(theme_bw(base_size=10))
+# ata.frame(ES=ROM.ma$b,SE=ROM.ma$se,Type="Summary",Study="Summary"))
+# forrest_data$Study2<-factor(forrest_data$Study, levels=rev(levels(forrest_data$Study)) )
+# levels(forrest_data$Study2)
+# plot1<-ggplot(data=forrest_data,aes(x=Study2,y=ES,ymax=ES+(1.96*SE),ymin=ES-(1.96*SE),size=factor(Type),colour=factor(Type)))+geom_pointrange()
+# plot2<-plot1+coord_flip()+geom_hline(aes(x=0), lty=2,size=1)+scale_size_manual(values=c(0.5,1))
+# plot3<-plot2+xlab("Study")+ylab("log response ratio")+scale_colour_manual(values=c("grey","black"))
+# plot3+theme(legend.position="none")
+
+
+```
+
+
+#USING GGPLOT
+```{R}
+pilot1_data$mean_age_months_centered36 <- pilot1_data$mean_age_months - 36
+pilot1_data$log_mean_age_months <- log(pilot1_data$mean_age_months)
+
+ggplot(filter(pilot1_data, !is.na(log_mean_age_months)), aes(x = short_cite, y = d, 
+                                                             ymin=d-sqrt(d_var)*1.96,
+                                                             ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange(aes(color=indoeuropean), alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) + 
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation")
+
+#png("secondgraph.png")
+
+
+```
+
+
+``` {r}
+
+m.gen_test <- metagen( TE= mean, 
+                  seTE = mean_se, 
+                  studlab = ID, 
+                  data = pilot1_data_summary, 
+                  sm = "SMD", 
+                  fixed = FALSE, 
+                  random = TRUE, 
+                  method.tau = "REML", 
+                  hakn = TRUE, 
+                  title = "pilot shape bias meta-analysis"
+)
+
+forest.meta(m.gen_test, 
+            sortvar = TE, 
+            prediction = TRUE, 
+            print.tau2 = FALSE, 
+            leftlabs = c("Author", "g", "SE"))
+
+funnel.meta(m.gen,
+            xlim = c(-0.5, 2),
+            studlab = TRUE)
+
+```
+
+```{r}
+
+ 
+
+col.contour = c("gray75", "gray85", "gray95")
+
+funnel.meta(m.gen, xlim = c(-0.5, 2),
+            contour = c(0.9, 0.95, 0.99),
+            col.contour = col.contour)
+png("funnel.png")
+
+```
+
+## Confirmatory analysis
+
+For primary analyses, i will exclude effect sizes from clinical populations and multilingual populations.
+
+I will investigate the hypotheses via multi-level meta-regressions using the metafor package.
+
+In all models, I will include random effects that control for non-independence between effect sizes based on grouping by paper and grouping by experiment.
+
+I will first fit:
+Shape bias ~ 1
+Shape bias ~ age
+shape bias ~ log(age)
+shape bias ~ poly(age,2)
+
+``` {r}
+
+
+# using the meta and metafor packages to analyze meta-analysis effect sizes
+mod_intercept <- rma.mv(d ~ 1, 
+       V = d_var,
+       random = ~1 | as.factor(Title) / 
+         as.factor(exp_num), 
+       slab = Title, 
+       data = filter(pilot1_data, 
+                                !is.na(d), !is.na(exp_num))) 
+
+summary(mod_intercept)
+```
+
+```{r}
+
+mod_age <- rma.mv(d ~ mean_age_months_centered36, 
+       V = d_var,
+       random = ~1 | as.factor(Title) / 
+         as.factor(exp_num), 
+       slab = Title, 
+       data = filter(pilot1_data, 
+                                !is.na(d), !is.na(exp_num)))
+
+summary(mod_age)
+```
+
+```{r}
+
+mod_log_age <- rma.mv(d ~ log_mean_age_months, 
+       V = d_var,
+       random = ~1 | as.factor(Title) / 
+         as.factor(exp_num), 
+       slab = Title, 
+       data = filter(pilot1_data, !is.na(log_mean_age_months)))
+
+summary(mod_log_age)
+```
+
+Let's look at what this means:
+
+```{r}
+ggplot(pilot1_data,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5) + 
+  geom_smooth(aes(group = 1), 
+              col = "black",
+              method = "lm", se = FALSE,
+              formula = y ~ log(x)) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  xlim(0,80)
+```
+
+
+```{r}
+mod_poly <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2), 
+       V = d_var,
+       random = ~1 | as.factor(Title) / 
+         as.factor(exp_num), 
+       slab = Title, 
+       data = filter(pilot1_data, !is.na(log_mean_age_months)))
+
+summary(mod_poly)
+```
+
+```{r}
+m.gen.reg <- metareg(m.gen, ~language)
+```
+
+
+```{r}
+rma.mv(d ~ poly(mean_age_months,2)*Informative_syntax, 
+       V = d_var,
+       random = ~1 | as.factor(Title) + 
+         as.factor(exp_num), 
+       slab = Title, 
+       data = pilot1_data[-57,]) %>% glance()
+```
+## Exploratory analysis
+
+``` {r}
+
+rma.mv(d ~ poly(mean_age_months,2), 
+       V = d_var,
+       random = ~1 | as.factor(language)+
+         as.factor(Title), 
+       slab = Title, 
+       data = pilot1_data[-57,]) %>% glance()
+```
+
+# Discussion
+
+
+# References
+
+
+
