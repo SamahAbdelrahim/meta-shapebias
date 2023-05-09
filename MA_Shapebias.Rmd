@@ -2,36 +2,18 @@
 title: "pilot1"
 author: "Samah"
 date: "2023-03-14"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
+
+# Preliminaries and data reading
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# uncomment below to render to html
-# output:
-#   bookdown::html_document2:
-#     toc: true
-#     toc_depth: 4
-#     theme: cosmo
-#     highlight: tango
-    
-# uncomment below to render to pdf
-output:
-  bookdown::pdf_book:
-    toc: true
-    toc_depth: 4
-    highlight: tango
-    
-bibliography: [references/packages.bib, references/references.bib]
-biblio-style: apalike
-nocite: '@*'
----
-
-
-
-# Results
 ``` {r, message = F}
 # additional libraries
 library("knitr")
@@ -47,7 +29,7 @@ library("nlme")
 library("meta")
 library("metafor")
 library(jtools) # Load jtools
-theme_set(theme_classic())
+theme_set(theme_bw())
 ```
 
 ```{r, message=FALSE}
@@ -61,19 +43,19 @@ df_shape_summary = df_shape %>%
   group_by(ID, Title, Author) %>%
   summarize(mean = mean(d), 
             mean_se = mean(d_var))
-
-
-  
 ```
 
+# Initial exploration
+
 First, Visualizing the data to have an initial idea of how it looks.
+
 First dividing the language group into two groups: the first one is the indo-european group which includes the English and the Spanish languages. The second group includes the rest of the languages: Japanese, Chinese, Tsimane.
 
 ``` {r, eval = T, message = F}
 
 df_shape$indoeuropean <- fct_relevel(as.factor(df_shape$language %in% 
-                                          c("english","spanish", "german")), 
-                                        "TRUE")
+                                                 c("english","spanish", "german")), 
+                                     "TRUE")
 
 # creating a plot that shows the effects sizes colored per language group as well as the polynomial regression curve that fits it. 
 
@@ -93,9 +75,15 @@ ggplot(df_shape,
   scale_linetype_discrete(name = "Indo-European") +
   theme(legend.position = "bottom")
 
-ggsave("first graph.png", width = 7, height = 4)
+# ggsave("first graph.png", width = 7, height = 4)
 ```
+
+## Basic meta-analysis
+
+## `metagen` approach
+
 using the meta-analytic function meta-gen which calculates the weights for each effects and confidence interval, pooled effect size, the heterogeneity.
+
 ``` {r}
 m.gen <- metagen( TE= d, 
                   seTE = d_var, 
@@ -107,31 +95,61 @@ m.gen <- metagen( TE= d,
                   method.tau = "REML", 
                   hakn = TRUE, 
                   title = "pilot shape bias meta-analysis"
- 
+                  
 )
 
-summary(m.gen)['TE']
-m.gen["TE.fixed"]
-m.gen["TE.random"]
-m.gen["w.random"]
-
-
+# summary(m.gen)['TE']
+# m.gen["TE.fixed"]
+# m.gen["TE.random"]
+# m.gen["w.random"]
 ```
 
 forest plot using the m-gen function object
+
 ```{r}
 forextobj <- forest.meta(m.gen, 
-             sortvar = TE, 
-             prediction = TRUE, 
-             print.tau2 = FALSE, 
-             leftlabs = c("Author", "g", "SE"))
-
+                         sortvar = TE, 
+                         prediction = TRUE, 
+                         print.tau2 = FALSE, 
+                         leftlabs = c("Author", "g", "SE"))
 ```
 
-forest plot from the rma model:
-``` {r, eval = F}
+forest plot from the rma model
 
+## `metafor` approach
+
+using rma.mv instead of m.gen
+
+```{r }
+mod <- rma.mv(yi = d, 
+              V = d_var, 
+              random = ~ 1 | ID,
+              slab = short_cite, 
+              data = df_shape)
+summary(mod)
+```
+
+Nested model. 
+
+```{r}
+mod_nested <- rma.mv(yi = d, 
+                     V = d_var, 
+                     random = ~ 1 | ID/exp_num,
+                     slab = short_cite, 
+                     data = filter(df_shape, !is.na(exp_num)))
+
+summary(mod_nested)
+```
+
+Forest plot from `metafor`.
+
+``` {r}
 forest(mod) 
+```
+
+Try this using ggplot
+
+```{r}
 forest_data <-tibble(yi = mod$yi,
                      se = sqrt(mod$vi), 
                      slab = mod$slab)
@@ -157,14 +175,15 @@ ggplot(forest_data,
 ```
 
 
-#USING GGPLOT
-```{R}
+## Revised forest plot
+
+```{r}
 df_shape$mean_age_months_centered36 <- df_shape$mean_age_months - 36
 df_shape$log_mean_age_months <- log(df_shape$mean_age_months)
 
 ggplot(df_shape, aes(x = short_cite, y = d, 
-                                                             ymin=d-sqrt(d_var)*1.96,
-                                                             ymax=d+sqrt(d_var)*1.96)) + 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
   geom_pointrange(aes(color=indoeuropean), alpha = .5, position=position_dodge2(width=.5)) +
   coord_flip() +
   geom_hline(yintercept = 0, lty = 2) + 
@@ -173,15 +192,10 @@ ggplot(df_shape, aes(x = short_cite, y = d,
   xlab("Citation")
 
 #png("secondgraph.png")
-
-
 ```
 
 
 ```{r}
-
- 
-
 col.contour = c("gray75", "gray85", "gray95")
 
 funnel(m.gen, 
@@ -191,7 +205,7 @@ funnel(m.gen,
        col.contour = col.contour)
 
 regtest(x = d, vi = d_var,
-          data = df_shape)
+        data = df_shape)
 
 # Add a legend
 legend(x = 3.3, y = 0.1, cex = 0.5,
@@ -203,7 +217,10 @@ legend(x = 3.3, y = 0.1, cex = 0.5,
 
 ```
 
+## Publication bias
+
 funnel plots using ggplot to account for moderators:
+
 ``` {r}
 x = summary(m.gen)['TE']
 y = summary(m.gen)['seTE']
@@ -212,7 +229,7 @@ ter = m.gen["TE.random"]
 
 
 data.gen = data.frame(x,y,ter)
-  
+
 ggplot(data = data.gen, mapping = aes(x=TE, y = seTE, color= )) +
   geom_point() +
   geom_vline(xintercept = 0.5401759)
@@ -232,43 +249,17 @@ ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= language)) +
   geom_smooth(method = "lm")
 
 
-ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= agegroup)) +
-  geom_point() +
-  geom_vline(xintercept = 0.5401759) +
-  scale_y_reverse()
-
-# +
-#   aes(x=d, y =reorder(d_var, -d), color = indoeuropean)
-
-
-```
-using rma.mv instead of m.gen
-```{r }
-mod <- rma.mv(yi = d, 
-                  V = d_var, 
-                  random = ~ 1 | ID,
-                  slab = short_cite, 
-                  data = df_shape)
-
-mod_nested <- rma.mv(yi = d, 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num)))
-
-summary(mod)
-summary(mod_nested)
-
 ```
 
 plotting coefficients from the rmv model:
-assuming that those coeffieints correspond to effect sizes
+assuming that those coefficients correspond to effect sizes
+
 ```{r}
 
 
 ```
 
-## Confirmatory analysis
+# Confirmatory analysis
 
 For primary analyses, i will exclude effect sizes from clinical populations and multilingual populations.
 
@@ -285,39 +276,40 @@ shape bias ~ poly(age,2)
 ### intercept:
 
 ``` {r}
-
-
 # using the meta and metafor packages to analyze meta-analysis effect sizes
 mod_intercept <- rma.mv(d ~ 1, 
-       V = d_var,
-       random = ~1 | as.factor(Title) / 
-         as.factor(exp_num), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(exp_num))) 
+                        V = d_var,
+                        random = ~1 | as.factor(Title) / 
+                          as.factor(exp_num), 
+                        slab = Title, 
+                        data = filter(df_shape, !is.na(exp_num))) 
 
 summary(mod_intercept)
 ```
+
 ### age
+
 ```{r}
 
 mod_age <- rma.mv(d ~ mean_age_months_centered36, 
-       V = d_var,
-       random = ~1 | as.factor(Title) / 
-         as.factor(exp_num), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(exp_num)))
+                  V = d_var,
+                  random = ~1 | as.factor(Title) / 
+                    as.factor(exp_num), 
+                  slab = Title, 
+                  data = filter(df_shape, !is.na(exp_num)))
 
 summary(mod_age)
 ```
 ### log age
+
 ```{r}
 
 mod_log_age <- rma.mv(d ~ log_mean_age_months, 
-       V = d_var,
-       random = ~1 | as.factor(Title) / 
-         as.factor(exp_num), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(log_mean_age_months)))
+                      V = d_var,
+                      random = ~1 | as.factor(Title) / 
+                        as.factor(exp_num), 
+                      slab = Title, 
+                      data = filter(df_shape, !is.na(log_mean_age_months)))
 
 summary(mod_log_age)
 ```
@@ -342,23 +334,22 @@ ggplot(df_shape,
   xlim(0,80)
 ```
 
-### polynmoial age
+### polynoial age
+
 ```{r}
 mod_poly <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2), 
-       V = d_var,
-       random = ~1 | as.factor(Title) / 
-         as.factor(exp_num), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(log_mean_age_months)))
+                   V = d_var,
+                   random = ~1 | as.factor(Title) / 
+                     as.factor(exp_num), 
+                   slab = Title, 
+                   data = filter(df_shape, !is.na(log_mean_age_months)))
 
 summary(mod_poly)
 ```
 
-```{r}
-m.gen.reg <- metareg(m.gen, ~language)
-```
 
 ### model comparison and plotting AICc , what is the criteria ? cutoff
+
 ```{r}
 #anova(mod_log_age, mod_poly, refit = TRUE)
 #anova(mod_age, mod_poly) ## the two models are not comparable, not nested
@@ -380,105 +371,124 @@ ggplot(data = data.AIC, mapping = aes(x = AIC_vector, y = modelnames)) +
   geom_point()
 
 ```
-setting the contrasts: 
+## Polynomial age models
 
-``` {r}
-
-df_shape = df_shape %>% 
-  mutate(lang_contrast = factor(language,
-                                levels = c("english", "chinese", "german", "japanese", 
-                                           "tsimane", "spanish"),
-                                labels = c(0,-1,1,1,1,1)),
-         lang_contrast = lang_contrast %>% 
-           as.character() %>% 
-           as.factor() )
-contrasts(df_shape$lang_contrast) <- contr.sum(6)
-df_shape$lang_contrast
-```
-
-### poly age with language
-``` {r}
-df_shape$lang_factor <- as.factor(df_shape$language)
-# contrasts(df_shape$lang_factor) <- contr.treatment(6, base = 2)
-df_shape$lang_factor <- fct_relevel(df_shape$lang_factor, "english", after = Inf)
-contrasts(df_shape$lang_factor) <- contr.sum(6)*0.5
-```
-#### orthogonal polynomial:
-``` {r}
-age_lang <- rma.mv(d ~ poly(mean_age_months_centered36,2) + language , 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num/language,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num), !is.na(language)))
-
-age_lang_interact <- rma.mv(d ~ poly(mean_age_months_centered36,2) * language, 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num/language,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num), !is.na(language)))
-
-age_lang %>% summary()
-age_lang_interact %>% summary()
-```
-
-#### the other polynomial:
-```{r}
-
-age_lang_npoly <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2) + lang_factor, 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num/language,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num), !is.na(language)))
-
-
-age_lang_interact_npoly <- rma.mv(d ~ mean_age_months_centered36 * lang_factor + 
-                                    I(mean_age_months_centered36^2) * lang_factor, 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num/lang_factor,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num), !is.na(language)))
-
-
-
-
-plot_summs(age_lang_npoly, robust = TRUE)
-plot_summs(age_lang_interact_npoly, robust = TRUE)
-
-age_lang_npoly %>% summary()
-age_lang_interact_npoly %>% summary()
-
-```
-
-### poly age with syntax
 
 ```{r}
 
-age_lang_syntax <- rma.mv(d ~ poly(mean_age_months,2) + language + Informative_syntax, 
-                  V = d_var, 
-                  random = ~ 1 | ID/exp_num/language,
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+age_lang <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + 
+                     I(mean_age_months_centered36^2) * indoeuropean, 
+                            V = d_var, 
+                            random = ~ 1 | ID/exp_num,
+                            slab = short_cite, 
+                            data = filter(df_shape, !is.na(exp_num), !is.na(language)))
 
 
-rma.mv(d ~ poly(mean_age_months,2)*Informative_syntax, 
-       V = d_var,
-       random = ~1 | as.factor(Title) + 
-         as.factor(exp_num), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(mean_age_months))) %>% glance()
+
 ```
 
-## Exploratory analysis
 
-``` {r}
 
-rma.mv(d ~ poly(mean_age_months,2), 
-       V = d_var,
-       random = ~1 | as.factor(language)+
-         as.factor(Title), 
-       slab = Title, 
-       data = filter(df_shape, !is.na(mean_age_months), !is.na(language))) %>% glance()
-```
+
+<!-- setting the contrasts:  -->
+
+<!-- ``` {r} -->
+
+<!-- df_shape = df_shape %>%  -->
+<!--   mutate(lang_contrast = factor(language, -->
+<!--                                 levels = c("english", "chinese", "german", "japanese",  -->
+<!--                                            "tsimane", "spanish"), -->
+<!--                                 labels = c(0,-1,1,1,1,1)), -->
+<!--          lang_contrast = lang_contrast %>%  -->
+<!--            as.character() %>%  -->
+<!--            as.factor() ) -->
+<!-- contrasts(df_shape$lang_contrast) <- contr.sum(6) -->
+<!-- df_shape$lang_contrast -->
+<!-- ``` -->
+
+<!-- ### poly age with language -->
+<!-- ``` {r} -->
+<!-- df_shape$lang_factor <- as.factor(df_shape$language) -->
+<!-- # contrasts(df_shape$lang_factor) <- contr.treatment(6, base = 2) -->
+<!-- df_shape$lang_factor <- fct_relevel(df_shape$lang_factor, "english", after = Inf) -->
+<!-- contrasts(df_shape$lang_factor) <- contr.sum(6)*0.5 -->
+<!-- ``` -->
+<!-- #### orthogonal polynomial: -->
+<!-- ``` {r} -->
+<!-- age_lang <- rma.mv(d ~ poly(mean_age_months_centered36,2) + language ,  -->
+<!--                    V = d_var,  -->
+<!--                    random = ~ 1 | ID/exp_num/language, -->
+<!--                    slab = short_cite,  -->
+<!--                    data = filter(df_shape, !is.na(exp_num), !is.na(language))) -->
+
+<!-- age_lang_interact <- rma.mv(d ~ poly(mean_age_months_centered36,2) * language,  -->
+<!--                             V = d_var,  -->
+<!--                             random = ~ 1 | ID/exp_num/language, -->
+<!--                             slab = short_cite,  -->
+<!--                             data = filter(df_shape, !is.na(exp_num), !is.na(language))) -->
+
+<!-- age_lang %>% summary() -->
+<!-- age_lang_interact %>% summary() -->
+<!-- ``` -->
+
+<!-- #### the other polynomial: -->
+<!-- ```{r} -->
+
+<!-- age_lang_npoly <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2) + lang_factor,  -->
+<!--                          V = d_var,  -->
+<!--                          random = ~ 1 | ID/exp_num/language, -->
+<!--                          slab = short_cite,  -->
+<!--                          data = filter(df_shape, !is.na(exp_num), !is.na(language))) -->
+
+
+<!-- age_lang_interact_npoly <- rma.mv(d ~ mean_age_months_centered36 * lang_factor +  -->
+<!--                                     I(mean_age_months_centered36^2) * lang_factor,  -->
+<!--                                   V = d_var,  -->
+<!--                                   random = ~ 1 | ID/exp_num/lang_factor, -->
+<!--                                   slab = short_cite,  -->
+<!--                                   data = filter(df_shape, !is.na(exp_num), !is.na(language))) -->
+
+
+
+
+<!-- plot_summs(age_lang_npoly, robust = TRUE) -->
+<!-- plot_summs(age_lang_interact_npoly, robust = TRUE) -->
+
+<!-- age_lang_npoly %>% summary() -->
+<!-- age_lang_interact_npoly %>% summary() -->
+
+<!-- ``` -->
+
+<!-- ### poly age with syntax -->
+
+<!-- ```{r} -->
+
+<!-- age_lang_syntax <- rma.mv(d ~ poly(mean_age_months,2) + language + Informative_syntax,  -->
+<!--                           V = d_var,  -->
+<!--                           random = ~ 1 | ID/exp_num/language, -->
+<!--                           slab = short_cite,  -->
+<!--                           data = filter(df_shape, !is.na(exp_num), !is.na(language))) -->
+
+
+<!-- rma.mv(d ~ poly(mean_age_months,2)*Informative_syntax,  -->
+<!--        V = d_var, -->
+<!--        random = ~1 | as.factor(Title) +  -->
+<!--          as.factor(exp_num),  -->
+<!--        slab = Title,  -->
+<!--        data = filter(df_shape, !is.na(mean_age_months))) %>% glance() -->
+<!-- ``` -->
+
+<!-- ## Exploratory analysis -->
+
+<!-- ``` {r} -->
+
+<!-- rma.mv(d ~ poly(mean_age_months,2),  -->
+<!--        V = d_var, -->
+<!--        random = ~1 | as.factor(language)+ -->
+<!--          as.factor(Title),  -->
+<!--        slab = Title,  -->
+<!--        data = filter(df_shape, !is.na(mean_age_months), !is.na(language))) %>% glance() -->
+<!-- ``` -->
 
 # Discussion
 
