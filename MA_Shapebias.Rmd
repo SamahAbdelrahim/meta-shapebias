@@ -2,7 +2,9 @@
 title: "pilot1"
 author: "Samah"
 date: "2023-03-14"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -177,10 +179,9 @@ ggplot(df_shape, aes(x = short_cite, y = d,
 
 ```
 
-
+# Looking for Asymmetry
+## using funnel plots
 ```{r}
-
- 
 
 col.contour = c("gray75", "gray85", "gray95")
 
@@ -215,14 +216,13 @@ data.gen = data.frame(x,y,ter)
   
 ggplot(data = data.gen, mapping = aes(x=TE, y = seTE, color= )) +
   geom_point() +
-  geom_vline(xintercept = 0.5401759)
-
+  geom_vline(xintercept = 0.5401759) +
+  scale_y_reverse()
 
 ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= indoeuropean)) +
   geom_point() +
   geom_vline(xintercept = 0.5401759) +
-  scale_y_reverse() +
-  geom_smooth(method = "lm")
+  scale_y_reverse()
 
 
 ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= language)) +
@@ -232,21 +232,32 @@ ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= language)) +
   geom_smooth(method = "lm")
 
 
-ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= agegroup)) +
-  geom_point() +
-  geom_vline(xintercept = 0.5401759) +
-  scale_y_reverse()
+# ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= agegroup)) +
+#   geom_point() +
+#   geom_vline(xintercept = 0.5401759) +
+#   scale_y_reverse()
 
 # +
 #   aes(x=d, y =reorder(d_var, -d), color = indoeuropean)
 
 
 ```
+## Eggers regresstion test: 
 ``` {r}
 m.gen$data %>%
   mutate(y = m.gen$TE/m.gen$seTE, x = 1/m.gen$seTE) %>%
   lm(y ~ x, data= .) %>%
   summary()
+
+#eggers regression
+ggplot(data = data.gen, mapping = aes(x=1/seTE, y = TE/seTE, color= )) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ggplot(data = df_shape, mapping = aes(x=d_var, y = d/d_var, color= indoeuropean)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
 ```
 using rma.mv instead of m.gen
 ```{r }
@@ -389,26 +400,27 @@ ggplot(data = data.AIC, mapping = aes(x = AIC_vector, y = modelnames)) +
 setting the contrasts: 
 
 ``` {r}
-
-df_shape = df_shape %>% 
-  mutate(lang_contrast = factor(language,
-                                levels = c("english", "chinese", "german", "japanese", 
-                                           "tsimane", "spanish"),
-                                labels = c(0,-1,1,1,1,1)),
-         lang_contrast = lang_contrast %>% 
-           as.character() %>% 
-           as.factor() )
-contrasts(df_shape$lang_contrast) <- contr.sum(6)
-df_shape$lang_contrast
+# 
+# df_shape = df_shape %>% 
+#   mutate(lang_contrast = factor(language,
+#                                 levels = c("english", "chinese", "german", "japanese", 
+#                                            "tsimane", "spanish"),
+#                                 labels = c(0,-1,1,1,1,1)),
+#          lang_contrast = lang_contrast %>% 
+#            as.character() %>% 
+#            as.factor() )
+# contrasts(df_shape$lang_contrast) <- contr.sum(6)
+# df_shape$lang_contrast
 ```
 
-### poly age with language
 ``` {r}
 df_shape$lang_factor <- as.factor(df_shape$language)
 # contrasts(df_shape$lang_factor) <- contr.treatment(6, base = 2)
 df_shape$lang_factor <- fct_relevel(df_shape$lang_factor, "english", after = Inf)
 contrasts(df_shape$lang_factor) <- contr.sum(6)*0.5
 ```
+
+### poly age with language
 #### orthogonal polynomial:
 ``` {r}
 age_lang <- rma.mv(d ~ poly(mean_age_months_centered36,2) + language , 
