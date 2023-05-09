@@ -371,24 +371,39 @@ ggplot(data = data.AIC, mapping = aes(x = AIC_vector, y = modelnames)) +
   geom_point()
 
 ```
+
 ## Polynomial age models
 
+Let's start with an interaction with `indoeuropean` with standard quadratic terms. This model is very interpretable. 
 
 ```{r}
-
-age_lang <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + 
-                     I(mean_age_months_centered36^2) * indoeuropean, 
-                            V = d_var, 
-                            random = ~ 1 | ID/exp_num,
-                            slab = short_cite, 
-                            data = filter(df_shape, !is.na(exp_num), !is.na(language)))
-
-
-
+rma.mv(d ~ mean_age_months_centered36 * indoeuropean + 
+         I(mean_age_months_centered36^2) * indoeuropean, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
 ```
 
+Next try breaking down by language. Here we can see Spanish is sparse and has a huge interaction term for some reason. Probably just overfit.
 
+```{r}
+rma.mv(d ~ mean_age_months_centered36 * language + 
+         I(mean_age_months_centered36^2) * language, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+```
+With the orthogonal polynomials, it blows up completely. 
 
+```{r}
+rma.mv(d ~ poly(mean_age_months_centered36,2) * language,
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+```
 
 <!-- setting the contrasts:  -->
 
