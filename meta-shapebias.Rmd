@@ -31,23 +31,15 @@ library("nlme")
 library(wesanderson)
 library("meta")
 library("metafor")
+library("here")
 # library("dmetar")
 library(jtools) # Load jtools
 theme_set(theme_bw())
 ```
 
-```{r, message=FALSE, eval=TRUE}
-# reading the data file
+```{r, message=FALSE}
 pilot1_data = read_csv("252.csv")
-df_shape= filter(pilot1_data, !is.na(d))
-# pilot1_data = pilot1_data %>%
-#   select(ID, Title, d, d_var, Author)
-
-# df_shape_summary = df_shape %>% 
-#   group_by(ID, Title, Author) %>%
-#   summarize(mean = mean(d), 
-#             mean_se = mean(d_var))
-
+df_shape <- filter(pilot1_data, !is.na(d))
 
 df_shape_summary <- df_shape %>%
   group_by(language) %>%
@@ -57,13 +49,13 @@ df_shape$englishgrp <- fct_relevel(as.factor(df_shape$language %in%
                                                  c("english")), 
                                      "TRUE")
 
-
 df_shape <- df_shape %>% group_by(language) %>%
-  mutate(language_grp = case_when(language == "english" ~ "Aenglish", language %in% c("chinese","japanese", "korean", "vietnamese") ~  "east_asian",
-          language %in% c("spanish", "german") ~ "indo-european", 
-          TRUE ~ "Tsimane"
-  ))
-
+  mutate(language_grp = case_when(language == "english" ~ "English", 
+                                  language %in% c("chinese","japanese", "korean", 
+                                                  "vietnamese") ~  "East Asian",
+                                  language %in% c("spanish", 
+                                                  "german") ~ "Indo-European", 
+          TRUE ~ "Tsimane"))
 
 
 df_shape$mean_age_months_centered36 <- df_shape$mean_age_months - 36
@@ -79,8 +71,8 @@ df_shape_indo <- df_shape %>%
 df_shape_nonendo <- df_shape %>% 
   filter(indoeuropean == FALSE)
 
-
-df_shape_solid <- df_shape %>% filter(solid != "substance")
+df_shape_solid <- df_shape %>% 
+  filter(solid != "substance")
 ```
 
 # Initial exploration
