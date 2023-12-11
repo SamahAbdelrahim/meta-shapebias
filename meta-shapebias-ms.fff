@@ -1,7 +1,0 @@
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\centering
-\includegraphics{meta-shapebias-ms_files/figure-latex/forest-1.pdf}
-\caption{\label{fig:forest}Forest plot of all coded effect sizes.}
-\end{figure*}

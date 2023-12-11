@@ -1,5 +1,6 @@
 rsconnect
 *.html
+*.fff
 *.tex
 *.log
 *_files
