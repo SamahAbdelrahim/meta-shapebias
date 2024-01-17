@@ -38,8 +38,11 @@ theme_set(theme_bw())
 ```
 
 ```{r, message=FALSE}
-pilot1_data = read_csv("252.csv")
-df_shape <- filter(pilot1_data, !is.na(d))
+#pilot1_data = read_csv("shape_bias_meta.csv")
+#df_shape <- filter(pilot1_data, !is.na(d))
+
+df_shape <- read_csv(here("data","shape_bias_meta.csv")) |>
+  filter(!is.na(d))
 
 df_shape_summary <- df_shape %>%
   group_by(language) %>%
