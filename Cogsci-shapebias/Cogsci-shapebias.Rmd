@@ -400,7 +400,8 @@ ggplot(df_shape,
 Based on the previous literature, we hypothesized that language and culture would be  potential moderators influencing the degree of shape-based generalization. Nevertheless, due to limited data availability beyond English, conducting language-specific analyses was not feasible. As a consequence, languages were categorized into two groups: Indo-European (encompassing German and Spanish and English), Non-Indo-European (including Japanese, Mandarin, Vietnamese, Korean, and Tsimane).
 ```{r include = FALSE, results = 'asis'}
 
-contrasts(df_shape$indoeuropean) <- contr.sum
+#contrasts(df_shape$indoeuropean) <- contr.sum
+
 lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                      V = d_var,
                      random = ~ 1 | ID/exp_num, 
@@ -429,7 +430,6 @@ kableExtra::kbl(lang_model_df) %>%
 writeLines(knitr::kable(lang_model_df,format = "latex", table.attr = "style='width:10%;'"))
 
 
-
 ```
 \begin{tabular}{l|r|r|r|r|r|r}
 \hline
@@ -449,7 +449,7 @@ Non-indoeuropean:I(age,2) & -0.0003480 & 0.0003586 & -0.9706056 & 0.3317447 & -0
 \hline
 \end{tabular}
 
-A model incorporating language group and age as moderators unveiled a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`). However, we didn't find significant effect size for the non indo-european group. Between-study heterogeneity remained high with an ($I^2 = `r round(I2_lang, 2)`$).
+A model incorporating language group and age as moderators unveiled a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`). However, we didn't find significant effects for the non indo-european group. The between-study heterogeneity remained high (in fact with a slight increase) of ($I^2 = `r round(I2_lang, 2)`$).
 
 ``` {r include = FALSE}
 tidy_lang_model <- tidy(lang_model)
@@ -517,7 +517,7 @@ mdlsyntaxcoeff <- tibble(coeff = c(round(coef(syntax_model),2)))
 # summary(emm)
 
 ```
-Lastly, we hypothesized that the informativeness of syntax in terms of whether it marks the count and mass noun sytnax or not will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is an informative or a neutral syntactic marking) didn't reveal a significant effect of syntax on the magnitude of shape bias ($p$ `r papaja::apa_p(syntax_model$pval)[3]`) at the outset. But a positive significant interaction between age and syntax of `r round(mdlsyntaxcoeff $coeff[4], 2)` ($p$ `r papaja::apa_p(syntax_model$pval)[4]`) was revealed contrary to our hypothesis .
+Lastly, we hypothesized that the informativeness of syntax in terms of whether it marks the count and mass noun sytnax or not, will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is informative or neutral) didn't reveal a significant effect of syntax on the magnitude of shape bias ($p$ `r papaja::apa_p(syntax_model$pval)[3]`) at the outset. But a positive significant interaction between age and neutral syntax of `r round(mdlsyntaxcoeff $coeff[4], 2)` ($p$ `r papaja::apa_p(syntax_model$pval)[4]`) was revealed contrary to our hypothesis .
 
 ## Publication bias
 ```{r funnelplot, fig.width= 4, include=TRUE, fig.pos="H", fig.cap = " The funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis"}
@@ -542,11 +542,15 @@ Given the potential indication of publication bias in the data, drawing definiti
 <!-- Explaining Variation:  -->
 The evidence for cross-cultural differences as well as the developmental changes explains some of the variation. However, the heterogeneity of effect sizes within studies suggest a possible effect of task specifics and stimuli used (Cimpian & Markman, 2005; Imai & Gentner, 1997; Samuelson & Horst, 2007). Testing for this hypothesis requires coding more of the details of the experiment design, types of stimuli used, and the procedure, as well as a way to measure these differences, which is lacking at this time.
 
-For instance, data contamination is potentially present, since some studies use novel objects with novel labels, while others use familiar objects with novel labels and both are making claims about the same phenomenon of early label based category induction using different age groups. If a familiar object was used to test children who are relatively older (around 4 or 5 years old), it is very likely that those children have enough knowledge and experience with their environment to navigate the problem in the level of the taxonomic relationships between objects and not merely rely on the saliency of perceptual properties. While shape bias is theorized to be a constraint or a heuristic to be applied while acquiring very early vocabulary of newly encountered categories at the basic leveL. So, the type of stimuli used for each age group might pose a challenge to the interpretations being made. An abundance of evidence in the literature suggests that 
+For instance, data contamination is potentially present, since some studies use novel objects with novel labels, while others use familiar objects with novel labels and both are making claims about the same phenomenon of early label based category induction using different age groups. If a familiar object was used to test children who are relatively older (around 4 or 5 years old), it is very likely that those children have enough knowledge and experience with their environment to navigate the problem in the level of the taxonomic relationships between objects for example and not merely rely on the saliency of perceptual properties. While shape bias is theorized to be a constraint or a heuristic to be applied while acquiring very early vocabulary of newly encountered categories at the basic leveL. So, the type of stimuli used for each age group might pose a challenge to the interpretations being made. An abundance of evidence in the literature suggests that ....
 
-The quadratic developmental curve of shape bias for the Indo-European group, that is mostly dominated by English, supports some of the theories proposed about shape bias being a statistical over-generalization that is built on the associations the child draws between the type of objects encountered in children's early life as well as the way those objects are labeled. The youngest group of children don't have enough data to form strong associations while the oldest group might have encontered some sort of a hypothesis shift after gaining more knowledge and experience with the world and the way language is being used. 
+The quadratic developmental curve of shape bias for the Indo-European group, that is mostly dominated by English, supports some of the theories proposed about shape bias being a statistical over-generalization that is built on the associations the child draws between the type of objects encountered in children's early life as well as the way those objects are labeled. The youngest group of children don't have enough data to form strong associations while the oldest group might have encountered some sort of a hypothesis shift after gaining more knowledge and experience with the world and the way language is being used, hence producing this curvilinear trajectory (CITE). 
 <!-- Cross-cultural differences:  -->
-Studies proposing the statistical generalization theory to explain shape bias fall into two categories: those examining vocabulary structure and those exploring environmental regularities. However, limitations arise. Lexical statistics studies exclusively focus on early English vocabulary, while investigations into environmental regularities have primarily compared the US and Tsimane group in Bolivia. Direct examination of these statistical regularities hypotheses was impeded however by the following reasons: limited data availability on vocabulary size and structure of the language of less industrialized communities, lack of early lexical statistics as well as detailed information on the distribution of shape-based objects in respective environments. The interchangeable nature of language and location variables in our dataset (e.g., English predominantly corresponds to the US, and Japanese to Japan), as well as the role syntax might be playing as a cue to form associations, making it challenging to differentiate these influences (Barner et al., 2009; Gershkoff-Stowe & Smith, 2004; Samuelson & Smith, 1999; Jara-Ettinger et al. (2022)).
+Studies proposing the statistical generalization theory to explain shape bias fall into two categories: those examining vocabulary structure and those exploring environmental regularities. Lexical statistics studies exclusively focus on early English vocabulary, while investigations into environmental regularities have primarily compared the US and Tsimane group in Bolivia. Direct examination of these statistical regularities hypotheses was impeded however by the following reasons: limited data availability on vocabulary size and structure of the language of less industrialized communities, lack of early lexical statistics as well as detailed information on the distribution of shape-based objects in respective environments. The interchangeable nature of language and location variables in our dataset (e.g., English predominantly corresponds to the US, and Japanese to Japan), as well as the role syntax might be playing as a cue to form associations, making it challenging to differentiate these influences ( Gershkoff-Stowe & Smith, 2004; Samuelson & Smith, 1999; Jara-Ettinger et al. (2022) Barner et al., 2009).
+
+More questions remain unanswered including but not limited to, the role conceptual information and functionality plays into acquiring meanings of words and overweighing perceptual cues. How simplicity and complexity of objects factor into the child's decision to use certain basis but not others for categorization. The nature of hypothesis shift the child undergoes to abandon shape bias, if it exists, in favor of other basis. 
+
+Although this meta-analysis left most of the questions open, but we believe it highlights
 
 
 
