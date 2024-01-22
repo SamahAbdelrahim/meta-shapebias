@@ -24,6 +24,14 @@ keywords: >
     
 output: cogsci2016::cogsci_paper
 always_allow_html: true
+toc: true 
+figsintext: yes
+fig_caption: yes
+
+header-includes:
+ \usepackage{float}
+ \floatplacement{figure}{H}
+
 #final-submission: \cogscifinalcopy
 ---
 
@@ -96,12 +104,14 @@ Given the wide range of factors claimed to influence the shape bias, as well as 
 We made the following pre-registered predictions about these covariates:
 
 RQ1: Shape bias increases with age, such that a greater shape bias is observed in older children.
+
 RQ2: There is a consistent association between population (with language as a proxy) and shape bias, such that the largest effect will be observed in English speaking populations, and the lowest in populations with the least industrialized environments. East Asian countries will lie in the middle. 
+
 RQ3: The strongest shape bias effect will be observed with simple uniform solid objects. 
+
 RQ4: Lastly, count and mass syntax will moderate the magnitude of the shape bias for younger children but not older children.
 
 ## Methods
-
 ```{r}
 df_shape <- read_csv(here("data","shape_bias_meta.csv")) |>
   filter(!is.na(d))
@@ -120,15 +130,14 @@ df_shape$indoeuropean <- fct_relevel(as.factor(df_shape$language %in%
                                      "TRUE")
 
 ```
-
 Except where noted, all hypotheses, literature search criteria, and statistical analyses were pre-registered at [http://osf.io/qmwup](). 
 
 ## Literature search
 We created an initial set of papers based on google scholar searches using the key words "shape bias," "word generalization," "word learning," 
 and citations of two papers [@landau1988; @imai1997]. Figure \@ref(fig:prisma) shows a PRISMA diagram describing our screening process.
-```{r prisma, include=FALSE ,eval=TRUE,fig.cap="PRISMA diagram showing the results of our literature screening process."}
-# from https://cran.r-project.org/web/packages/PRISMAstatement/vignettes/PRISMA.html
 
+```{r prisma , eval= FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process."}
+#from https://cran.r-project.org/web/packages/PRISMAstatement/vignettes/PRISMA.html
 prisma(found = 161,
        found_other = 0,
        no_dupes = 161, 
@@ -138,11 +147,16 @@ prisma(found = 161,
        full_text_exclusions = 33, 
        qualitative = 46,
        quantitative = 46)
+
+
+
 ```
 In total, 161 papers were found. We filtered these first via titles and abstracts and then via full-text screening, based on the following eligibility criteria:
 
 Effects must be from an experiment (e.g., with random assignment of participants to at least two conditions), 
-The paper must include participants less than 5 years old, 
+
+The paper must include participants less than 5 years old,
+
 The paper must use a word extension task that contrasts shape with other properties of the referent. 
 
 Applying these criteria resulted in `r length(unique(df_shape$ID))` papers that both satisfied our criteria and reported enough information to calculate the effect size (ES), either by directly reporting the ES reporting the proportion of choosing shape in text, tables or graphs; or reporting a statistical test (typically a comparison of shape bias against chance using a test such as  a one sample $t$-test). 
@@ -156,32 +170,39 @@ Because many of the papers we coded were decades old, reporting standards varied
 For each effect size, we coded the following moderators: 
 
 Participant age
+
 Number of participants
+
 Type of syntax used -- informative (count/mass) or neutral^[We additionally coded whether common or proper noun syntax was used and (if applicable) whether animate or inanimate syntax was used, but both of these were sparsely used and we do not discuss them further.]
+
 The alternative stimulus properties for the test objects (e.g., shape, color, material)
-The nature of the stimuli: solidity, animacy, and whether they were two- or three-dimensional 
+
+The nature of the stimuli: solidity, animacy, and whether they were two- or three-dimensional
+
 The type of exposure before testing: whether the child saw multiple training examples of the target object, or just a single example
+
 Participants' vocabulary size
+
 Country of test and language spoken by participants 
+
 Response mode (grasping, pointing, or verbalizing) 
+
 Measured behavior (e.g., behavioral, eye tracking) 
-Population type (typically developing or not) 
+
+Population type (typically developing or not)
+
 Total number of trials
 
 We also coded a number of other moderators that were not part of our preregistered analyses and will not be described here. Because studies often included multiple age groups, different types of stimuli, and various manipulations, one experiment usually yielded more than one effect size, and often papers included multiple experiments. 
-
 ```{r}
 n_bilingual <- sum(df_shape$monolingual == "bilingual", na.rm=TRUE)
-n_atypical <- sum(df_shape$child_type1 == "TL", na.rm=TRUE)
+n_atypical <- sum(df_shape$child_type1 == "ASD", na.rm=TRUE)
 
 df_shape <- filter(df_shape, 
                    monolingual == "monolingual", 
                    child_type1 == "TD")
 ```
-
 For our preregistered analyses, we excluded effect sizes from clinical populations (N=`r n_atypical`) and multilingual populations (N=`r n_bilingual`), though these effect sizes remain in the datafile we provide.
-
-
 ```{r}
 
 df_shape$englishgrp <- fct_relevel(as.factor(df_shape$language %in% 
@@ -204,9 +225,7 @@ df_shape$indoeuropean <- fct_relevel(as.factor(df_shape$language %in%
                                                  c("english","spanish", "german")), 
                                      "TRUE")
 ```
-
 Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while Japanese was the closest language with only `r sum(df_shape$language == "japanese")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
-
 The final coded sample consisted of `r length(unique(df_shape$ID))` papers with `r nrow(df_shape)` effect sizes. 
 
 ## Analytic approach
@@ -214,21 +233,29 @@ The final coded sample consisted of `r length(unique(df_shape$ID))` papers with 
 All analyses were performed using the `metafor` package in R (Viechtbauer, 2010). We pooled effect sizes using a multi-level meta analysis model with experiment number nested within paper ID as a random effect, controlling for the non-independence of effect sizes from the same experiment or paper. We attempted to perform confirmatory analysis of our preregistered hypotheses via multi-level meta-regressions including age, language, item properties of the stimuli, and syntax as fixed effects. In some cases (described below), we did not have sufficient data to add particular factors to our analyses.
 
 # Results
-
 ```{r main_model}
 mod <- rma.mv(yi = d, 
               V = d_var, 
               random = ~ 1 | ID/exp_num,
               slab = short_cite, 
               data = filter(df_shape, !is.na(exp_num)))
-```
 
-```{r forest, fig.height = 6, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Color indicates language family."}
 df_forest <- tibble(short_cite = "Meta-analytic estimate", 
                     d = coef(mod), 
                     ci.lb = mod$ci.lb,
                     ci.ub = mod$ci.ub)
 
+```
+```{r heterogeneity}
+#caluculating the heterogeneity from this website: https://www.metafor-project.org/doku.php/tips:i2_multilevel_multivariate 
+
+W <- diag(1/mod$vi)
+X <- model.matrix(mod)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+I2 <- sum(mod$sigma2) / (sum(mod$sigma2) + (mod$k-mod$p)/sum(diag(P)))
+```
+Figure \@ref(fig:forest) shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting an overall shape bias effect across all studies. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$), motivating our moderation effects. 
+```{r forest, fig.height = 3, fig.width= 4 , fig.pos="H" , echo=FALSE, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Color indicates language family."}
 
 ggplot(df_shape, aes(x = short_cite, y = d, 
                      ymin=d-sqrt(d_var)*1.96,
@@ -243,25 +270,13 @@ ggplot(df_shape, aes(x = short_cite, y = d,
   ylab("Standardized Mean Difference (d)") + 
   xlab("Citation") +
   ggthemes::scale_color_solarized(name = "Indo-European") +
-  theme_minimal(base_size = 8)
+  theme_minimal(base_size = 8) +
+  theme(legend.position = c(0.1, 0.25), axis.title.y =element_blank(), 
+        legend.background = element_rect(color = "black", size = 0.001))
 ```
-
-```{r heterogeneity}
-#caluculating the heterogeneity from this website: https://www.metafor-project.org/doku.php/tips:i2_multilevel_multivariate 
-
-W <- diag(1/mod$vi)
-X <- model.matrix(mod)
-P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
-I2 <- sum(mod$sigma2) / (sum(mod$sigma2) + (mod$k-mod$p)/sum(diag(P)))
-```
-
-Figure \@ref(fig:forest) shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting an overall shape bias effect across all studies. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$), motivating our moderation effects. 
 
 ## Developmental change
-
 Since the heterogeneity was very high, we subsequently incorporated age into our models to determine whether part of the heterogeneity could be explained by the developmental changes in the magnitude of the shape bias (RQ1). To determine the best functional curve that fits the development of shape bias, we followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic. To compare models, we used the corrected Akaike information criterion AICc for model selection. A difference of more than four between the minimal AICc and any other AICc was interpreted as a meaningful difference. 
-
-
 ``` {r age_trend}
 mod_intercept <- rma.mv(d ~ 1, 
                         V = d_var,
@@ -293,12 +308,9 @@ AICs <- tibble(aic = c(summary(mod_intercept)$fit.stats[5,'REML'],
                        summary(mod_poly)$fit.stats[5,'REML']), 
                model = c("intercept", "age", "logage", "polyage")) |>
   mutate(delta_aic = aic - max(aic))
-
 ```
-
 All models including age fit substantially better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adoptd a polynomial function for our following anaylsis.
-
-```{r dev_change, fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
+```{r include = FALSE, dev_change, fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
 
 mod_age_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean, 
                   V = d_var,
@@ -315,46 +327,6 @@ df_pred <- bind_cols(df_pred, as_tibble(predict(mod_age_ie,
                                       newmods = as.matrix(df_pred)))) |>
   mutate(mean_age_months = mean_age_months_centered36 + 36, 
          indoeuropean = as.logical(1-indoeuropean)) # flip because coding for the predictor is IE = FALSE
-
-
-
-
-
-mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
-                         V = d_var,
-                         random = ~ 1 | ID/exp_num, 
-                         slab = short_cite, 
-                         data = filter(df_shape, !is.na(exp_num)))
-
-df_poly_pred <- expand_grid(mean_age_months_centered36 = -12:48,
-                            'I(mean_age_months_centered36^2)' = I(mean_age_months_centered36^2),
-                            indoeuropean = c(TRUE,FALSE)) |> 
-  mutate(`mean_age_months_centered36:indoeuropean` =  
-           mean_age_months_centered36 * as.numeric(indoeuropean),       `indoeuropean:I(mean_age_months_centered36^2)` = as.numeric(indoeuropean) * I(mean_age_months_centered36^2) ) 
-
-df_poly_pred <- bind_cols(df_poly_pred, as_tibble(predict(mod_ployage_ie, 
-                                      newmods = as.matrix(df_poly_pred)))) |>
-  mutate(mean_age_months = mean_age_months_centered36 + 36, 
-         indoeuropean = as.logical(1-indoeuropean))
-
-
-ggplot(df_shape,
-       aes(x = mean_age_months_centered36, y = d, color = language))+
-  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
-                  alpha = .5, size = 0.3) + 
-  geom_line(data = df_poly_pred, 
-              aes(y = pred, 
-                  group = indoeuropean, 
-                  lty  = indoeuropean), 
-              col = "black", size = 1) +
-  geom_hline(yintercept = 0, lty = 3) + 
-  ylab("Standardized Mean Difference (d)") + 
-  xlab("Mean age (months)") +
-  scale_color_discrete(name = "Language") +
-  scale_linetype_discrete(name = "Indo-European") +
-  theme(legend.position = "bottom") + 
-  theme_classic(base_size = 8)
-
 
 ggplot(df_shape,
        aes(x = mean_age_months, y = d, color = language))+
@@ -376,8 +348,46 @@ ggplot(df_shape,
 
 ```
 
-## Cross-linguistic differences
 
+```{r fig.width= 3.7, fig.height= 2.4}
+mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
+                         V = d_var,
+                         random = ~ 1 | ID/exp_num, 
+                         slab = short_cite, 
+                         data = filter(df_shape, !is.na(exp_num)))
+
+df_poly_pred <- expand_grid(mean_age_months_centered36 = -24:48,
+                            indoeuropean = c(TRUE,FALSE)) |> 
+  mutate('I(mean_age_months_centered36^2)' = I(mean_age_months_centered36^2),
+         `mean_age_months_centered36:indoeuropean` =  
+           mean_age_months_centered36 * as.numeric(indoeuropean),       `indoeuropean:I(mean_age_months_centered36^2)` = as.numeric(indoeuropean) * I(mean_age_months_centered36^2) ) 
+
+df_poly_pred <- bind_cols(df_poly_pred, as_tibble(predict(mod_ployage_ie, 
+                                      newmods = as.matrix(df_poly_pred)))) |>
+  mutate(mean_age_months = mean_age_months_centered36 + 36, 
+         indoeuropean = as.logical(1-indoeuropean))
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months_centered36, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var),
+                  alpha = .5, size = 0.3) +
+  geom_line(data = df_poly_pred, 
+              aes(y = pred, 
+                  group = indoeuropean, 
+                  lty  = indoeuropean), 
+              col = "black", size = 1) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +  # Change the shape of the points in the legend
+  theme_classic(base_size = 4) +
+  theme(legend.position = "top") +  # Adjust the size of the legend keys
+  guides(color = guide_legend(override.aes = list(size = 0.00001)))
+
+```
+## Cross-linguistic differences
 <!-- We will then fit moderators of interest in independent models (with interactions of age and moderator using the appropriate functional form found above): -->
 <!-- Syntax - mass vs. count: bias ~ age * syntax -->
 <!-- Language - English (and other european languages) vs. east asian language: -->
@@ -387,10 +397,10 @@ ggplot(df_shape,
 
 <!-- * RQ2: There is a consistent association between population (with language as a proxy) and shape bias, such that the largest effect will be observed in English speaking populations, and the lowest in populations with the least industrialized environments. East Asian countries will lie in the middle.  -->
 
-
 Based on the previous literature, we hypothesized that language and culture would be  potential moderators influencing the degree of shape-based generalization. Nevertheless, due to limited data availability beyond English, conducting language-specific analyses was not feasible. As a consequence, languages were categorized into two groups: Indo-European (encompassing German and Spanish and English), Non-Indo-European (including Japanese, Mandarin, Vietnamese, Korean, and Tsimane).
-
 ```{r include = FALSE, results = 'asis'}
+
+contrasts(df_shape$indoeuropean) <- contr.sum
 lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                      V = d_var,
                      random = ~ 1 | ID/exp_num, 
@@ -409,6 +419,8 @@ I2_lang <- sum(lang_model$sigma2) / (sum(lang_model$sigma2) + (lang_model$k-lang
 
 
 
+
+
 lang_model_df <- as.data.frame(coef(summary(lang_model)))
 
 kableExtra::kbl(lang_model_df) %>%
@@ -419,24 +431,25 @@ writeLines(knitr::kable(lang_model_df,format = "latex", table.attr = "style='wid
 
 
 ```
-
-
 \begin{tabular}{l|r|r|r|r|r|r}
 \hline
   & estimate & se & zval & pval & ci.lb & ci.ub\\
 \hline
-Indoeuropean & 0.6075115 & 0.0819181 & 7.4160818 & 0.0000000 & 0.4469549 & 0.7680680\\
+Indo-european & 0.7559587 & 0.0875282 & 8.6367459 & 0.0000000 & 0.5844066 & 0.9275108\\
 \hline
-Age & -0.0024557 & 0.0025593 & -0.9595392 & 0.3372872 & -0.0074718 & 0.0025603\\
+Age & 0.0098961 & 0.0034317 & 2.8837736 & 0.0039294 & 0.0031702 & 0.0166221\\
 \hline
-Non-indoeuropean & -0.0936049 & 0.0793845 & -1.1791340 & 0.2383448 & -0.2491956 & 0.0619858\\
+Non-indoeuropean & -0.0804150 & 0.0806551 & -0.9970222 & 0.3187537 & -0.2384961 & 0.0776662\\
 \hline
-Age:Non-indoeuropean & -0.0164049 & 0.0051793 & -3.1673918 & 0.0015381 & -0.0265562 & -0.0062536\\
+I(age,2) Indoeuropean & -0.0006427 & 0.0001236 & -5.2005863 & 0.0000002 & -0.0008850 & -0.0004005\\
+\hline
+Age:non-indoeuropean & -0.0122972 & 0.0075019 & -1.6391960 & 0.1011725 & -0.0270007 & 0.0024064\\
+\hline
+Non-indoeuropean:I(age,2) & -0.0003480 & 0.0003586 & -0.9706056 & 0.3317447 & -0.0010508 & 0.0003548\\
 \hline
 \end{tabular}
 
-A model incorporating language group and age as moderators showed effects for both variables. The analysis unveiled a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with the quadratic age `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`)
-Difference was not significant Nevertheless, between-study heterogeneity remained high with an ($I^2 = `r round(I2_lang, 2)`$).  motivating our moderation effects. 
+A model incorporating language group and age as moderators unveiled a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[1], 2)` ($p$ `r papaja::apa_p(lang_model$pval)[1]`). However, we didn't find significant effect size for the non indo-european group. Between-study heterogeneity remained high with an ($I^2 = `r round(I2_lang, 2)`$).
 
 ``` {r include = FALSE}
 tidy_lang_model <- tidy(lang_model)
@@ -447,9 +460,6 @@ rownames(tidy_lang_model) <- paste0(c("intercept", "Age", "non-indo-european", "
 # Use the corrected lang_model in apa_table
 coef(summary(lang_model)) |>
   papaja::apa_table(row.names =  TRUE)
-
-
-
 
 ```
 
@@ -464,7 +474,6 @@ df_shape_nonendo <- df_shape %>%
 
 <!-- * RQ3: The strongest shape bias effect will be observed with simple uniform solid objects.  -->
 We also hypothesized that complexity of solid objects could be moderating shape bias. However, the number of papers that used and reported complexity as a dimension of interest were 3 papers and `r length(which(df_shape$complexity == 'complex')) ` effect sizes. Thus, assessing the impact of object complexity on shape bias as in our third hypothesis was impractical based solely on meta-analysis data and synthesis of the state of evidence in the literature. Sparse data, variations in stimulus types across studies, along with unclear criteria for categorizing objects as complex or simple, posed challenges for a comprehensive analysis. 
-
 ```{r include=FALSE}
 df_shape_solid <- df_shape %>% 
   filter(solid != "substance")
@@ -478,26 +487,44 @@ df_shape %>% group_by(complexity, ID) %>% filter( complexity == "complex") %>% s
 
 
 ```
-
 ## Syntactic effects
 
 <!-- * RQ4: Lastly, count and mass syntax will moderate the magnitude of the shape bias for younger children but not older children.   -->
-Lastly, we hypothesized that the informativeness of syntax in terms of whether it marks the count and mass noun sytnax or not will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is count, mass, or a neutral syntactic marking) didn't reveal significant effects of syntax on the magnitude of shape bias. In fact, the model revealed a small positive significant effect for the interaction between age and a neutral syntax, contrary 
-
 ``` {r include = FALSE}
+# df_shape <- df_shape %>% mutate(count_mass = count_mass %>% as.factor(), Informative_syntax = Informative_syntax %>% as.factor() )
+#                                 #%>% `contrasts<-`(value = 0.5* contr.sum(4)))
+#                                   
+#                                   
+# contrasts(df_shape$count_mass) <-0.5* contr.sum(4)
+# contrasts(df_shape$Informative_syntax) <-0.5* contr.sum(2)
 
-rma.mv(d ~ mean_age_months_centered36 * count_mass, 
+syntax_model <- rma.mv(d ~ mean_age_months_centered36 * Informative_syntax, 
        V = d_var, 
        random = ~ 1 | ID/exp_num,
        slab = short_cite, 
        data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+
+
+mdlsyntaxcoeff <- tibble(coeff = c(round(coef(syntax_model),2)))
+
+
+# library(emmeans)
+# 
+# # Calculate estimated marginal means
+# emm <- emmeans(syntax_model, ~ Informative_syntax)
+# 
+# # Display the estimated marginal means
+# summary(emm)
+
 ```
+Lastly, we hypothesized that the informativeness of syntax in terms of whether it marks the count and mass noun sytnax or not will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is an informative or a neutral syntactic marking) didn't reveal a significant effect of syntax on the magnitude of shape bias ($p$ `r papaja::apa_p(syntax_model$pval)[3]`) at the outset. But a positive significant interaction between age and syntax of `r round(mdlsyntaxcoeff $coeff[4], 2)` ($p$ `r papaja::apa_p(syntax_model$pval)[4]`) was revealed contrary to our hypothesis .
+
 ## Publication bias
+```{r funnelplot, fig.width= 4, include=TRUE, fig.pos="H", fig.cap = " The funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis"}
 
-```{r} funnelplot, fig.cap = " The funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis"}
+funnel(mod, xlab = "Effect size", xlim = c(-2,5.2), refline = 0) 
 
-
-funnel(mod, main="Standard Error")
+#theme(axis.title.y =element_blank())
 
 ```
 Indications emerged pointing towards a potential publication bias within the examined literature, as revealed by the funnel plot depicted in Figure Figure \@ref(fig:funnelplot). The visual analysis of the plot suggests a skew towards significant positive effect sizes, indicative of a shape bias. Subsequently, we employed an Egger's regression test as a quantitative measure to assess any asymmetry within the funnel plot. The results yielded a statistically significant positive intercept, affirming the presence of such asymmetry and providing further evidence of the potential publication bias.
@@ -507,8 +534,6 @@ Indications emerged pointing towards a potential publication bias within the exa
 #   lm(y ~ x, data= .) %>%
 #   summary()
 ```
-
-
 Lastly, not all stimuli in every study we coded were predicted by their authors to yield a shape bias. The number of effect sizes using solid objects in this MA is `r length(which(df_shape$solidity == 'solid')) ` while only `r length(which(df_shape$solidity != 'solid')) `  use non-solid objects. So, the heterogeneity remains high even when generalizing by shape for a set of stimuli that is dominated by solid objects.
 
 # Discussion
