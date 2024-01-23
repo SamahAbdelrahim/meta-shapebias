@@ -9,18 +9,10 @@ author-information: >
     \AND {\large \bf Sharon J.~Derry (SDJ@Macc.Wisc.Edu)} \\ Department of Educational Psychology, 1025 W. Johnson Street \\ Madison, WI 53706 USA}
 
 abstract: >
-    Include no author information in the initial submission, to facilitate
-    blind review.  The abstract should be one paragraph, indented 1/8 inch on both sides,
-    in 9~point font with single spacing. The heading 'Abstract'
-    should be 10~point, bold, centered, with one line of space below
-    it. This one-paragraph abstract section is required only for standard
-    six page proceedings papers. Following the abstract should be a blank
-    line, followed by the header 'Keywords' and a list of
-    descriptive keywords separated by semicolons, all in 9~point font, as
-    shown below.
+   A shape bias was theorized by many researchers to be facilitating early noun learning for children. However, the conflicting evidence of this bias in the literature and the reported cross cultural differences posed a question about the origins of this shape bias as well as the validity of the claim itself and the measures used to investigate it. In this paper, we synthesised quantitative evidence of shape bias as well as assessed the theoretical accounts of shape bias across different studies and proposals. We found an overall evidence of shape bias that is dominated by English speakers, with a huge between study heterogeneity highlighting the inconsistency of procedures among other factors. Evidence is lacking to properly evaluate cross-cultural differences and publication bias likely exists. 
     
 keywords: >
-    Add your choice of indexing terms or keywords; kindly use a semi-colon; between each term.
+    Shape bias; word learning; developmental change; cross-cultural differences; Meta analysis; publication bias; statistical over-generalization. 
     
 output: cogsci2016::cogsci_paper
 always_allow_html: true
@@ -192,9 +184,7 @@ Measured behavior (e.g., behavioral, eye tracking)
 Population type (typically developing or not)
 
 Total number of trials
-
-We also coded a number of other moderators that were not part of our preregistered analyses and will not be described here. Because studies often included multiple age groups, different types of stimuli, and various manipulations, one experiment usually yielded more than one effect size, and often papers included multiple experiments. 
-```{r}
+```{r include=FALSE}
 n_bilingual <- sum(df_shape$monolingual == "bilingual", na.rm=TRUE)
 n_atypical <- sum(df_shape$child_type1 == "ASD", na.rm=TRUE)
 
@@ -202,7 +192,6 @@ df_shape <- filter(df_shape,
                    monolingual == "monolingual", 
                    child_type1 == "TD")
 ```
-For our preregistered analyses, we excluded effect sizes from clinical populations (N=`r n_atypical`) and multilingual populations (N=`r n_bilingual`), though these effect sizes remain in the datafile we provide.
 ```{r}
 
 df_shape$englishgrp <- fct_relevel(as.factor(df_shape$language %in% 
@@ -225,11 +214,12 @@ df_shape$indoeuropean <- fct_relevel(as.factor(df_shape$language %in%
                                                  c("english","spanish", "german")), 
                                      "TRUE")
 ```
+We also coded a number of other moderators that were not part of our preregistered analyses and will not be described here. Because studies often included multiple age groups, different types of stimuli, and various manipulations, one experiment usually yielded more than one effect size, and often papers included multiple experiments. 
+For our preregistered analyses, we excluded effect sizes from clinical populations (N=`r n_atypical`) and multilingual populations (N=`r n_bilingual`), though these effect sizes remain in the datafile we provide.
 Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while Japanese was the closest language with only `r sum(df_shape$language == "japanese")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
 The final coded sample consisted of `r length(unique(df_shape$ID))` papers with `r nrow(df_shape)` effect sizes. 
 
 ## Analytic approach
-
 All analyses were performed using the `metafor` package in R (Viechtbauer, 2010). We pooled effect sizes using a multi-level meta analysis model with experiment number nested within paper ID as a random effect, controlling for the non-independence of effect sizes from the same experiment or paper. We attempted to perform confirmatory analysis of our preregistered hypotheses via multi-level meta-regressions including age, language, item properties of the stimuli, and syntax as fixed effects. In some cases (described below), we did not have sufficient data to add particular factors to our analyses.
 
 # Results
@@ -255,14 +245,16 @@ P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
 I2 <- sum(mod$sigma2) / (sum(mod$sigma2) + (mod$k-mod$p)/sum(diag(P)))
 ```
 Figure \@ref(fig:forest) shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting an overall shape bias effect across all studies. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$), motivating our moderation effects. 
-```{r forest, fig.height = 3, fig.width= 4 , fig.pos="H" , echo=FALSE, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Color indicates language family."}
+```{r forest, fig.height = 3.5, fig.width= 3 , fig.pos="H" , echo=FALSE, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Color indicates language family."}
 
-ggplot(df_shape, aes(x = short_cite, y = d, 
-                     ymin=d-sqrt(d_var)*1.96,
-                     ymax=d+sqrt(d_var)*1.96)) + 
+df_shape %>% 
+  mutate(short_cite = fct_reorder(short_cite, desc(d))) %>%
+  ggplot(aes(x = short_cite, y = d, 
+             ymin=d-sqrt(d_var)*1.96,
+             ymax=d+sqrt(d_var)*1.96)) + 
   geom_pointrange(aes(color=indoeuropean), alpha = .5, position=position_dodge2(width=.5)) +
   geom_pointrange(data = df_forest, 
-                  aes(ymin = ci.lb - 0.3, ymax = ci.ub + 0.3), pch = 5, col = "black", size = 0.7) + 
+                  aes(ymin = ci.lb - 0.3, ymax = ci.ub + 0.3), pch = 5, col = "black", size = 0.2) + 
   coord_flip() +
   geom_hline(yintercept = 0, lty = 2) +
   geom_hline(data = mod ,yintercept = mod$TE.random) +
@@ -271,8 +263,10 @@ ggplot(df_shape, aes(x = short_cite, y = d,
   xlab("Citation") +
   ggthemes::scale_color_solarized(name = "Indo-European") +
   theme_minimal(base_size = 8) +
-  theme(legend.position = c(0.1, 0.25), axis.title.y =element_blank(), 
+  theme(legend.position = c(0.8, 0.5), axis.title.y =element_blank(), 
         legend.background = element_rect(color = "black", size = 0.001))
+
+#c(0.1, 0.25)
 ```
 
 ## Developmental change
@@ -349,7 +343,7 @@ ggplot(df_shape,
 ```
 
 
-```{r fig.width= 3.7, fig.height= 2.4}
+```{r fig.width= 3.4, fig.height= 2.4}
 mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                          V = d_var,
                          random = ~ 1 | ID/exp_num, 
@@ -538,6 +532,8 @@ Lastly, not all stimuli in every study we coded were predicted by their authors 
 
 # Discussion
 
+summary of the findings: 
+
 Given the potential indication of publication bias in the data, drawing definitive conclusions is challenging. Nevertheless, the data offer intriguing points for further discussion. Notably, while a general positive effect size for shape bias is evident, the substantial heterogeneity underscores the need to examine the sources of variation. This becomes particularly important in light of the notable overrepresentation of English-speaking participants in the overall sample.
 <!-- Explaining Variation:  -->
 The evidence for cross-cultural differences as well as the developmental changes explains some of the variation. However, the heterogeneity of effect sizes within studies suggest a possible effect of task specifics and stimuli used (Cimpian & Markman, 2005; Imai & Gentner, 1997; Samuelson & Horst, 2007). Testing for this hypothesis requires coding more of the details of the experiment design, types of stimuli used, and the procedure, as well as a way to measure these differences, which is lacking at this time.
@@ -550,10 +546,9 @@ Studies proposing the statistical generalization theory to explain shape bias fa
 
 More questions remain unanswered including but not limited to, the role conceptual information and functionality plays into acquiring meanings of words and overweighing perceptual cues. How simplicity and complexity of objects factor into the child's decision to use certain basis but not others for categorization. The nature of hypothesis shift the child undergoes to abandon shape bias, if it exists, in favor of other basis. 
 
-Although this meta-analysis left most of the questions open, but we believe it highlights
+We believe this work highlights the need for more investigation of the shape bias and word learning constraints by developing consistent measures and using unified procedures to facilitate interpretations and theoretical comparisons as well as 
 
-
-
+limitations and conclusions
 
 
 \newpage
