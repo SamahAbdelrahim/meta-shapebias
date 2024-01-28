@@ -1,5 +1,5 @@
 ---
-title: "Examining the robustness and generalizability of the 'shape bias': a comprehensive analysis"
+title: "Examining the robustness and generalizability of the shape bias: a meta-analysis"
 bibliography: library.bib
 csl: apa6.csl
 document-params: "10pt, letterpaper"
