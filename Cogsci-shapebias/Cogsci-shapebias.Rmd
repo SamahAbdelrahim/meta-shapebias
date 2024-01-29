@@ -31,7 +31,7 @@ header-includes:
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(fig.crop = TRUE, 
                       fig.pos = "tb", fig.path='figs/',
-                      echo=F, warning=F, cache=TRUE, 
+                      echo=F, warning=F, cache=FALSE, 
                       message=F, sanitize = T)
 ```
 
@@ -120,7 +120,7 @@ df_shape$log_mean_age_months <- log(df_shape$mean_age_months)
 #                                      "IndoEuropean", "Non-Indoeuropean")
 
 df_shape <- df_shape %>% mutate(indoeuropean = case_when(df_shape$language %in% 
-                                                 c("english","spanish", "german") ~ "IndoEuropean", TRUE ~ "Non-Indoeuropean"))
+                                                 c("english","spanish", "german") ~ "Indo-European", TRUE ~ "Non-Indo-European"))
 
 df_shape <- df_shape |>
   filter(!is.na(d), !is.na(indoeuropean), !is.na(mean_age_months_centered36))
@@ -272,6 +272,7 @@ df_shape %>% group_by(complexity, ID) %>% filter( complexity == "complex") %>% s
 Figure \@ref(fig:forest) shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting an overall shape bias effect across all studies. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$). Not all stimuli in every study we coded were predicted by their authors to yield a shape bias. The number of effect sizes using solid objects in this MA is `r length(which(df_shape$solidity == 'solid')) ` while only `r length(which(df_shape$solidity != 'solid')) `  use non-solid objects. So, the heterogeneity remains high even when generalizing by shape for a set of stimuli that is dominated by solid objects, motivating our moderation effects. 
 
 ## Developmental change
+
 Since the heterogeneity was very high, we subsequently incorporated age into our models to determine whether part of the heterogeneity could be explained by the developmental changes in the magnitude of the shape bias (RQ1). To determine the best functional curve that fits the development of shape bias, we followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic. To compare models, we used the corrected Akaike information criterion AICc for model selection. A difference of more than four between the minimal AICc and any other AICc was interpreted as a meaningful difference. 
 
 ``` {r age_trend}
@@ -307,55 +308,10 @@ AICs <- tibble(aic = c(summary(mod_intercept)$fit.stats[5,'REML'],
   mutate(delta_aic = aic - max(aic))
 ```
 
-All models including age fit substantially better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adoptd a polynomial function for our following anaylsis.
-
-```{r include = FALSE, dev_change, fig.pos="H", fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
-
-mod_age_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean, 
-                  V = d_var,
-                  random = ~ 1 | ID/exp_num, 
-                  slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num)))
-
-df_pred <- expand_grid(mean_age_months_centered36 = 14:48,
-                              indoeuropean = c(TRUE,FALSE)) |> 
-          mutate(`mean_age_months_centered36:indoeuropean` =  
-                   mean_age_months_centered36 * as.numeric(indoeuropean)) 
-
-df_pred <- bind_cols(df_pred, as_tibble(predict(mod_age_ie, 
-                                      newmods = as.matrix(df_pred)))) |>
-  mutate(mean_age_months = mean_age_months_centered36 + 36, 
-         indoeuropean = as.logical(1-indoeuropean)) # flip because coding for the predictor is IE = FALSE
-
-# ggplot(df_shape,
-#        aes(x = mean_age_months, y = d, color = language))+
-#   geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
-#                   alpha = .5, size = 0.3) + 
-#   geom_line(data = df_pred, 
-#               aes(y = pred, 
-#                   group = indoeuropean, 
-#                   lty  = indoeuropean), 
-#               col = "black", size = 1) +
-#   geom_ribbon(data = merged, 
-#               aes(y = pred, 
-#                   ymin = pred - se, 
-#                   ymax = pred + se, 
-#                   group = indoeuropean), 
-#               fill = "black", alpha = 0.2) +
-#   geom_hline(yintercept = 0, lty = 3) + 
-#   ylab("Standardized Mean Difference (d)") + 
-#   xlab("Mean age (months)") +
-#   scale_color_discrete(name = "Language") +
-#   scale_linetype_discrete(name = "Indo-European") +
-#   theme(legend.position = "bottom") + 
-#   theme_classic(base_size = 8)
+All models including age fit substantially better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a polynomial function for our following anaylsis.
 
 
-```
-
-
-```{r fig.width = 3.5, fig.height= 3, echo=FALSE, fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
-
+```{r}
 mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                          V = d_var,
                          random = ~ 1 | ID/exp_num, 
@@ -368,41 +324,24 @@ vector1 <- 1:293
 poly_predictions$index <- vector1
 df_shape$index <- vector1
 merged <- merge(x = poly_predictions, y = df_shape[ , c("mean_age_months", "indoeuropean", "index")], by = "index")
+```
 
-
-# df_poly_pred <- expand_grid(mean_age_months_centered36 = -24:48,
-#                             indoeuropean = c(TRUE,FALSE)) |> 
-#   mutate('I(mean_age_months_centered36^2)' = I(mean_age_months_centered36^2),
-#          `mean_age_months_centered36:indoeuropean` =  
-#            mean_age_months_centered36 * as.numeric(indoeuropean),       `indoeuropean:I(mean_age_months_centered36^2)` = as.numeric(indoeuropean) * I(mean_age_months_centered36^2) ) 
-# 
-# df_poly_pred <- bind_cols(df_poly_pred, as_tibble(predict(mod_ployage_ie, 
-#                                       newmods = as.matrix(df_poly_pred)))) |>
-#   mutate(mean_age_months = mean_age_months_centered36 + 36, 
-#          indoeuropean = as.logical(1-indoeuropean))
-
-
+```{r fig.env = "figure*", fig.width = 8, fig.height= 4, out.width = "100%", fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
 ggplot(df_shape,
        aes(x = mean_age_months, y = d, color = language))+
   geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var),
                   alpha = .5, size = 0.1) +
   geom_line(data = merged, 
-            aes(y = pred, 
-                group = indoeuropean, 
-                lty  = indoeuropean), 
-            col = "black", size = 1) +
+            aes(y = pred),
+            group = 1, 
+            col = "black") +
   geom_hline(yintercept = 0, lty = 3) + 
   ylab("Standardized Mean Difference (d)") + 
   xlab("Mean age (months)") +
   scale_color_discrete(name = "Language") +
-  scale_linetype_discrete(name = "Indo-European") +  # Change the shape of the points in the legend
-  theme_classic(base_size = 4) +
-  theme(legend.position = "top", legend.title=element_blank(), legend.direction = "horizontal") +  # Adjust the size of the legend keys
-  guides(color = guide_legend(override.aes = list(size = 0.00001))) + ggthemes::scale_color_solarized()
-
-
-
-
+  facet_wrap(~indoeuropean) + 
+  theme_minimal() + 
+  theme(legend.position = "bottom")
 ```
 
 
@@ -438,57 +377,34 @@ P <- W_lang - W_lang %*% X_lang %*% solve(t(X_lang) %*% W_lang %*% X_lang) %*% t
 I2_lang <- sum(lang_model$sigma2) / (sum(lang_model$sigma2) + (lang_model$k-lang_model$p)/sum(diag(P)))
 
 
-
-
-
 lang_model_df <- as.data.frame(round(coef(summary(lang_model)), 4))
 
 kableExtra::kbl(lang_model_df) %>%
   kable_classic_2(full_width = F)
 
-writeLines(knitr::kable(lang_model_df,format = "latex", table.attr = "style='width:10%;'"))
+writeLines(knitr::kable(lang_model_df,
+                        format = "latex", 
+                        digits = 3,
+                        table.attr = "style='width:10%;'"))
 ```
 
-
-<!-- \begin{tabular}{l|r|r|r|r|r|r} -->
-<!-- \hline -->
-<!--   & estimate & se & zval & pval & ci.lb & ci.ub\\ -->
-<!-- \hline -->
-<!-- Indo-european & 0.7560 & 0.0875 & 8.6367 & 0.0000 & 0.5844 & 0.9275\\ -->
-<!-- \hline -->
-<!-- Age & 0.0099 & 0.0034 & 2.8838 & 0.0039 & 0.0032 & 0.0166\\ -->
-<!-- \hline -->
-<!-- Non-indoeuropean & -0.0804 & 0.0807 & -0.9970 & 0.3188 & -0.2385 & 0.0777\\ -->
-<!-- \hline -->
-<!-- I(age,2) Indoeuropean & -0.0006 & 0.0001 & -5.2006 & 0.0000 & -0.0009 & -0.0004\\ -->
-<!-- \hline -->
-<!-- Age:non-indoeuropean & -0.0123 & 0.0075 & -1.6392 & 0.1012 & -0.0270 & 0.0024\\ -->
-<!-- \hline -->
-<!-- Non-indoeuropean:I(age,2) & -0.0003 & 0.0004 & -0.9706 & 0.3317 & -0.0011 & 0.0004\\ -->
-<!-- \hline -->
-<!-- \end{tabular} -->
 \begin{table}[h]
 \centering
 \resizebox{0.5\textwidth}{!}{%
-\begin{tabular}{l|r|r|r|r|r|r}
+\begin{tabular}{lrrrrrr}
 \hline
-  & estimate & se & zval & pval & ci.lb & ci.ub\\
+  & \bf{$\beta$} & \bf{SE} & \bf{$z$} & \bf{$p$} & \bf{lower CI} & \bf{upper CI}\\
 \hline
-Indo-european & 0.7560 & 0.0875 & 8.6367 & 0.0000 & 0.5844 & 0.9275\\
+Intercept & 0.756 & 0.088 & 8.637 & <0.001 & 0.584 & 0.927\\
+Age & 0.010 & 0.003 & 2.884 & 0.004 & 0.003 & 0.017\\
+Non-Indo-European & -0.080 & 0.081 & -0.997 & 0.319 & -0.238 & 0.078\\
+$\text{Age}^2$ & -0.001 & 0.000 & -5.201 & 0.000 & -0.001 & 0.000\\
+Age $\times$ Non-IE & -0.012 & 0.007 & -1.639 & 0.101 & -0.027 & 0.002\\
+Non-IE $\times \text{Age}^2$ & 0.000 & 0.000 & -0.971 & 0.332 & -0.001 & 0.000\\
 \hline
-Age & 0.0099 & 0.0034 & 2.8838 & 0.0039 & 0.0032 & 0.0166\\
-\hline
-Non-indoeuropean & -0.0804 & 0.0807 & -0.9970 & 0.3188 & -0.2385 & 0.0777\\
-\hline
-I(age,2) Indoeuropean & -0.0006 & 0.0001 & -5.2006 & 0.0000 & -0.0009 & -0.0004\\
-\hline
-Age:non-indoeuropean & -0.0123 & 0.0075 & -1.6392 & 0.1012 & -0.0270 & 0.0024\\
-\hline
-Non-indoeuropean:I(age,2) & -0.0003 & 0.0004 & -0.9706 & 0.3317 & -0.0011 & 0.0004\\
-\hline
-\end{tabular}%
+\end{tabular}
 }
-\caption{Results of the meta-regression model incoroprating both language and age}
+\caption{Results of the meta-regression model incoroprating both language and age (in months). Non-IE = "Non-Indo-European".}
 \end{table}
 
 
@@ -513,6 +429,7 @@ df_shape_indo <- df_shape %>%
 df_shape_nonendo <- df_shape %>% 
   filter(indoeuropean == FALSE)
 ```
+
 ## Shape and complexity effects
 
 <!-- * RQ3: The strongest shape bias effect will be observed with simple uniform solid objects.  -->
@@ -521,6 +438,7 @@ We also hypothesized that complexity of solid objects could be moderating shape 
 ## Syntactic effects
 
 <!-- * RQ4: Lastly, count and mass syntax will moderate the magnitude of the shape bias for younger children but not older children.   -->
+
 ``` {r include = FALSE}
 # df_shape <- df_shape %>% mutate(count_mass = count_mass %>% as.factor(), Informative_syntax = Informative_syntax %>% as.factor() )
 #                                 #%>% `contrasts<-`(value = 0.5* contr.sum(4)))
@@ -548,30 +466,10 @@ mdlsyntaxcoeff <- tibble(coeff = c(round(coef(syntax_model),2)))
 # summary(emm)
 ```
 
-``` {r syntax, fig.width= 3.4, fig.height= 2.4 , echo=FALSE, fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on syntax, and model fits for informative and nuetral syntax are shown in black."}
-ggplot(df_shape,
-       aes(x = mean_age_months, y = d, color = Informative_syntax))+
-  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
-                  alpha = .5, size = 0.1) + 
-  geom_smooth(aes(group = Informative_syntax, 
-                  lty  = Informative_syntax), 
-              col = "black",
-              method = "lm", se = TRUE,
-              formula = y ~ poly(x,2)) +
-  geom_hline(yintercept = 0, lty = 3) + 
-  ylab("Standardized Mean Difference (d)") + 
-  xlab("Mean age (months)") +
-  scale_linetype_discrete(name = "Syntax") +
-  theme(legend.position = "bottom") +
-  theme_minimal(base_size = 8) +  # Change the shape of the points in the legend
-  theme_classic(base_size = 4) +
-  theme(legend.position = "top", legend.title=element_blank(), legend.direction = "horizontal") +  # Adjust the size of the legend keys
-  guides(color = guide_legend(override.aes = list(size = 0.00001))) + ggthemes::scale_color_solarized()
-
-```
 Lastly, we hypothesized that whether the syntax marks count and mass nouns or not will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is informative or neutral) didn’t reveal a significant effect of syntax on the magnitude of shape bias ($p=$ `r papaja::apa_p(syntax_model$pval)[3]`) at the outset. But a positive significant interaction between age and neutral syntax of `r round(mdlsyntaxcoeff $coeff[4], 2)` ($p=$ `r papaja::apa_p(syntax_model$pval)[4]`) was revealed contrary to our hypothesis.
 
 ## Publication bias
+
 ``` {r eggers test copied from its source code, eval = FALSE}
 eggers.test = function(x) {
 
@@ -639,14 +537,16 @@ eggerstest <- df_shape %>%
 
 eggerscoeff <- tibble(coeff = c(round(coef(eggerstest),2)))
 ```
-```{r funnelplot, fig.width= 3.4, fig.height= 2.4, include=TRUE , fig.cap = " The funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis"}
 
-funnel(mod, xlab = "Effect size", xlim = c(-2,5.2), refline = 0) 
 
-#theme(axis.title.y =element_blank())
+```{r funnelplot, fig.width= 4, fig.height= 3, out.width ="100%", include=TRUE, fig.cap="The significance funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis. The diagonal line shows effect sizes that are exactly p = 0.05. Yellow values show affirmative (significant) studies. The diamond shows the estiamte from the meta-analytic model descirbed above."}
 
+PublicationBias::significance_funnel(yi = df_shape$d, 
+                                     vi = df_shape$d_var, 
+                                     est_all = coef(mod_poly)[1]) +
+  theme(legend.position = "bottom")
 ```
-Indications emerged pointing towards a potential publication bias within the examined literature, as revealed by the funnel plot depicted in Figure Figure \@ref(fig:funnelplot). The visual analysis of the plot suggests a skew towards significant positive effect sizes, indicative of a shape bias. Subsequently, we employed an Egger's regression test as a quantitative measure to assess any asymmetry within the funnel plot. The results yielded a statistically significant positive intercept `r round(eggerscoeff$coeff[1], 2)` ($p< 0.0001$), affirming the presence of such asymmetry and providing further evidence of the potential publication bias.
+Indications emerged pointing towards a potential publication bias within the examined literature, as revealed by the significance funnel plot depicted in Figure \@ref(fig:funnelplot) [@mathur2020]. The visual analysis of the plot suggests a skew towards significant positive effect sizes, indicative of a shape bias. Subsequently, we employed an Egger's regression test as a quantitative measure to assess any asymmetry within the funnel plot. The results yielded a statistically significant positive intercept `r round(eggerscoeff$coeff[1], 2)` ($p< 0.0001$), affirming the presence of such asymmetry and providing further evidence of the potential publication bias.
 
 # Discussion
 Synthesizing effect sizes across studies provided evidence of a shape bias among English and Indo-European speakers, but with no significant evidence for a cross-cultural difference, and huge between-study heterogeneity.
