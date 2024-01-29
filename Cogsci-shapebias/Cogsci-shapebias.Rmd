@@ -66,9 +66,9 @@ Yet the degree of shape bias observed in word learning experiments varies across
 
 Where then does the shape bias come from? We consider four different explanations: innateness, learning from lexical statistics, learning from syntax, and learning from environmental statistics. These explanations are not necessarily mutually exclusive -- multiple sources of learning input could contribute to the developmental emergence of the shape bias. 
 
-An initial explanation for the shape bias proposed that children have an innate tendency to generalize by shape. This proposal was called into question, however, by the observation that the shape bias is primarily found in linguistic generalization tasks as opposed to non-linguistic similarity judgment tasks [@landau1988; @smith_object_2002; @poulin1999role; @samuelson2000children] indicating that it is unlikely to be a generalized perceptual bias. Further, the magnitude of the shape bias appears to vary across ages, cultures, and languages, inconsistent with a purely nativist explanation.
+An initial explanation for the shape bias could be that children have an innate tendency to generalize by shape. This proposal was called into question, however, by the observation that the shape bias is primarily found in linguistic generalization tasks as opposed to non-linguistic similarity judgment tasks [@landau1988; @smith_object_2002; @poulin1999role; @samuelson2000children; @imai_childrens_1994] indicating that it is unlikely to be a generalized perceptual bias. Further, the magnitude of the shape bias appears to vary across ages, cultures, and languages, inconsistent with a purely nativist explanation.
 
-An alternative proposal argues that children acquire the shape bias by generalizing the lexical statistics of their language. The early vocabulary of English-speaking children in the US is predominantly comprised of nouns referring to solid objects, suggesting that the shape bias may be an “over-hypothesis” that nouns tend to generalize in the same way as one another [@gershkoff2004shape; @samuelson_statistical_2002; @samuelson1999; @perry2010learn; @colunga2000learning; @yoshida2003known].  Children’s early experience with nouns referring to solid objects, in turn, privileges the property of shape, leading to an inductive bias, such that as children learn more nouns, they should be more likely to pick up on shape as an organizing regularity of the lexicon.
+An alternative proposal argues that children acquire the shape bias by generalizing the lexical statistics of their language. The early vocabulary of English-speaking children in the US is predominantly comprised of nouns referring to solid objects, suggesting that the shape bias may be an “over-hypothesis” that nouns tend to generalize in the same way as one another [@gershkoff2004shape; @samuelson_statistical_2002; @samuelson1999; @perry2010learn; @colunga2000learning; @yoshida2003known]. Children’s early experience with nouns referring to solid objects, in turn, privileges the property of shape, leading to an inductive bias, such that as children learn more nouns, they should be more likely to pick up on shape as an organizing regularity of the lexicon.
 
 Additionally, this generalization may be guided by the syntax of their language. In English, count nouns (e.g., “ball”) are generalized by shape while mass nouns (e.g., “sand”) that cannot be modified by numerals or combined with indefinite articles (‘a’ or ‘an’) are not. The presence of this distinction might facilitate English-speaking children (and other children learning languages with a mass-count distinction) in picking out the category of words to which the shape bias can be productively applied. In contrast, children learning languages that lack the mass-count distinction (e.g., some East Asian languages like Mandarin or Japanese) do not have access to this organizing principle, making the statistics of their lexicon less clear cut. Some experiments have also explicitly varied whether count/mass language is used in the presentation of new objects, directly testing whether this syntactic cue guides generalization [@samuelson2008rigid; @soja1991ontological; @soja_perception_1992]. 
 
@@ -86,7 +86,7 @@ Third, studies vary significantly in their procedures, stimuli, and comparison d
 <!-- FIXME: no culture/language -->
 Functionality and complexity are linked in the literature. English and Japanese-speaking children are found to prioritize shape for complex industry-based artifacts with clear functions. Only Japanese children, however, exhibit reduced shape generalization for simple uniform objects with no clear function (@imai1997; @gentner_1978). We also attempt to evaluate the relationship between complexity of objects and the propensity to generalize by shape (Research Question 3).
 
-Finally, the syntax used in the presentation of stimuli varies across experiments. Some experimental procedures explicitly use mass/count marking to manipulate generalization , while other procedures avoid syntactic marking [@soja1991ontological; @imai1997; @samuelson2008rigid; @soja_perception_1992; @perry2011shape; @horst2013s; @dansereau2017young]. We attempt to quantify the effects of this marking and its interaction with development (Research Question 4). 
+Finally, the syntax used in the presentation of stimuli varies across experiments. Some experimental procedures explicitly use mass/count marking to manipulate generalization, while other procedures avoid syntactic marking [@soja1991ontological; @imai1997; @samuelson2008rigid; @soja_perception_1992; @perry2011shape; @horst2013s; @dansereau2017young]. Additionally, Younger children in [@soja_1992] showed some sensitivity to the syntax that is incongruent with the ontological construal of the object "i.e. using count noun syntax with substances" compared to older children. We attempt to quantify the effects of this marking and its interaction with development (Research Question 4). 
 
 # The current study
 
@@ -496,7 +496,7 @@ coef(summary(lang_model)) |>
 
 ```
 
-```{r}
+```{r include = FALSE}
 df_shape_indo <- df_shape %>%
   filter(indoeuropean == TRUE)
 
@@ -562,7 +562,7 @@ ggplot(df_shape,
 Lastly, we hypothesized that whether the syntax marks count and mass nouns or not will moderate the magnitude of the shape bias but only for the younger group of kids. A model that incorporates age and the nature of syntactic marking (whether it is informative or neutral) didn’t reveal a significant effect of syntax on the magnitude of shape bias ($p=$ `r papaja::apa_p(syntax_model$pval)[3]`) at the outset. But a positive significant interaction between age and neutral syntax of `r round(mdlsyntaxcoeff $coeff[4], 2)` ($p=$ `r papaja::apa_p(syntax_model$pval)[4]`) was revealed contrary to our hypothesis.
 
 ## Publication bias
-``` {r eggers test copied from its source code, eval = FALSE}
+``` {r eggers test copied from its source code, eval = FALSE, include = FALSE}
 eggers.test = function(x) {
 
     # Validate
@@ -619,8 +619,7 @@ eggers.test = function(x) {
 
 }
 ```
-
-``` {r}
+``` {r include = FALSE}
 
 eggerstest <- df_shape %>%
   mutate(y = d/d_var, x = 1/d_var) %>%
@@ -631,7 +630,9 @@ eggerscoeff <- tibble(coeff = c(round(coef(eggerstest),2)))
 ```
 ```{r funnelplot, fig.width= 3.4, fig.height= 2.4, include=TRUE , fig.cap = " The funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis"}
 
-funnel(mod, xlab = "Effect size", xlim = c(-2,5.2), refline = 0) 
+funnel(mod, xlab = "Effect size", xlim = c(-2,5.2), refline = 0) %>% theme(
+  axis.title.x = element_text(size = 5),
+  axis.text.x = element_text(size = 5))
 
 #theme(axis.title.y =element_blank())
 
