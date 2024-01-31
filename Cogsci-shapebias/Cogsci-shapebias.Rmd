@@ -58,7 +58,7 @@ One reason for researchers’ long-standing interest in the shape bias relates t
 
 The shape bias is typically demonstrated in word extension tasks. For instance, in one study 15-month-old children were shown an exemplar object that had a specific non-visual property like producing a sound when tapped. Then children were asked which of the test objects – which matched the exemplar in either color, shape, or material – belonged to the same category. Children selectively extended the non-visual property to the test objects that resembled the exemplar in shape, revealing a bias towards this dimension [@graham_2010]. (Here we use the term "bias" as a convenient descriptor of this behavioral tendency without presupposing any particular underlying mechanism.)
 
-Yet the degree of shape bias observed in word learning experiments varies across ages, cultures, languages, and experimental protocols and items. Some of this variation has been claimed to be theoretically important -- for example, cross-cultural and developmental variation -- while some is likely due to irrelevant procedural details, or random statistical variation. The current paper aims to synthesize evidence relating to the shape bias using statistical meta-analysis to quantify different sources of variation in the magnitude of the shape bias and to consider links between these sources of variation and potential theoretical accounts of the nature of the shape bias.
+Yet the degree of shape bias observed in word learning experiments varies across ages, cultures, languages, and experimental protocols and items. Some of this variation has been claimed to be theoretically important -- for example, cross-cultural and developmental variation -- while some is likely due to irrelevant procedural details, or random statistical variation. In addition, some variation may be caused by publication bias, which has been an issue in other developmental literatures [@bergmann2018;@frank2017]. The current paper aims to synthesize evidence relating to the shape bias using statistical meta-analysis to quantify different sources of variation in the magnitude of the shape bias and to consider links between these sources of variation and potential theoretical accounts of the nature of the shape bias.
 
 ## Theoretical accounts of the shape bias
 
@@ -251,36 +251,34 @@ df_shape %>% group_by(complexity, ID) %>% filter( complexity == "complex") %>% s
 
 ```
 
-Figure \ref{fig:forest} shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting a positive shape bias effect. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
-
-Not all stimuli in every study we coded were predicted by their authors to yield a shape bias. The number of effect sizes using solid objects in this MA is `r length(which(df_shape$solidity == 'solid')) ` while only `r length(which(df_shape$solidity != 'solid')) `  use non-solid objects. So, the heterogeneity remains high even when generalizing by shape for a set of stimuli that is dominated by solid objects, motivating the moderation analyses below. 
-
-## Developmental change
 
 ``` {r age_trend}
+df_shape_solid <- filter(df_shape, !is.na(exp_num), 
+                         solidity == "solid")
+
 mod_intercept <- rma.mv(d ~ 1, 
                         V = d_var,
                         random = ~ 1 | ID/exp_num, 
                         slab = short_cite, 
-                        data = filter(df_shape, !is.na(exp_num))) 
+                        data = df_shape_solid) 
 
 mod_age <- rma.mv(d ~ mean_age_months_centered36, 
                   V = d_var,
                   random = ~ 1 | ID/exp_num, 
                   slab = short_cite, 
-                  data = filter(df_shape, !is.na(exp_num)))
+                  data = df_shape_solid)
 
 mod_log_age <- rma.mv(d ~ log_mean_age_months, 
                       V = d_var,
                       random = ~ 1 | ID/exp_num, 
                       slab = short_cite, 
-                      data = filter(df_shape, !is.na(exp_num))) 
+                      data = df_shape_solid) 
 
 mod_poly <- rma.mv(d ~ poly(mean_age_months_centered36,2), 
                    V = d_var,
                    random = ~ 1 | ID/exp_num, 
                    slab = short_cite, 
-                   data = filter(df_shape, !is.na(exp_num), !is.na(mean_age_months_centered36)))
+                   data = df_shape_solid)
 
 AICs <- tibble(aic = c(summary(mod_intercept)$fit.stats[5,'REML'],
                        summary(mod_age)$fit.stats[5,'REML'], 
@@ -291,24 +289,37 @@ AICs <- tibble(aic = c(summary(mod_intercept)$fit.stats[5,'REML'],
 ```
 
 
+Figure \ref{fig:forest} shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting a positive shape bias effect. Nevertheless, effects varied substantially, yielding a substantial amount of between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
+
+Not all stimuli in every study we coded were predicted by their authors to yield a shape bias. The number of effect sizes using solid objects in this MA is `r length(which(df_shape$solidity == 'solid')) ` while only `r length(which(df_shape$solidity != 'solid'))`  use non-solid objects. Although we did not preregister removing studies with non-solid targets, we believe that the fairest estimates of comes from the subset of studies using solid objects; thus, our remaining analyses deviate from the preregistration by excluding these `r length(which(df_shape$solidity != 'solid'))` studies. Heterogeneity for this subset is FIXME - 
+
+mod_intercept
+
+So, the heterogeneity remains high even when generalizing by shape for a set of stimuli with only solid objects, motivating the moderation analyses below. 
+
+## Developmental change
+
+
 
 ```{r}
 mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                          V = d_var,
                          random = ~ 1 | ID/exp_num, 
                          slab = short_cite, 
-                         data = filter(df_shape, !is.na(exp_num)))
+                         data = df_shape_solid)
 
 poly_predictions <- as.data.frame (predict(mod_ployage_ie))
-poly_predictions$short_cite <- df_shape$short_cite
-vector1 <- 1:293
+poly_predictions$short_cite <- df_shape_solid$short_cite
+vector1 <- 1:nrow(df_shape_solid)
 poly_predictions$index <- vector1
-df_shape$index <- vector1
-merged <- merge(x = poly_predictions, y = df_shape[ , c("mean_age_months", "indoeuropean", "index")], by = "index")
+df_shape_solid$index <- vector1
+merged <- merge(x = poly_predictions, 
+                y = df_shape_solid[ , c("mean_age_months", "indoeuropean",
+                                        "index")], by = "index")
 ```
 
-```{r fig.env = "figure*", fig.width = 8, fig.height= 4, out.width = "100%", fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
-ggplot(df_shape,
+```{r dev-change, fig.env = "figure*", fig.width = 8, fig.height= 4, out.width = "100%", fig.cap = "Effect size plotted by average participant age. Points indicate individual effect, and error bars show variance. Points are colored based on language, and model fits for Indo-European and non-Indo-European languages are shown in black."}
+ggplot(df_shape_solid,
        aes(x = mean_age_months, y = d, color = language))+
   geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var),
                   alpha = .5, size = 0.1) +
@@ -325,11 +336,11 @@ ggplot(df_shape,
   theme(legend.position = "bottom")
 ```
 
-Since the heterogeneity was very high, we subsequently incorporated age into our models to determine whether part of the heterogeneity could be explained by the developmental changes in the magnitude of the shape bias (RQ1). To determine the best functional curve that fits the development of shape bias, we followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic. To compare models, we used the corrected Akaike information criterion AICc for model selection. A difference of $\Delta_{AIC} > 4$ between the lowest AICc and any other AICc was interpreted as a meaningful difference. 
+Since the heterogeneity was very high, we subsequently incorporated age into our models to determine whether part of the heterogeneity could be explained by the developmental changes in the magnitude of the shape bias. To determine the best functional curve that fits the development of shape bias, we followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic. To compare models, we used the corrected Akaike information criterion AICc for model selection. A difference of $\Delta_{AIC} > 4$ between the lowest AICc and any other AICc was interpreted as a meaningful difference. 
 
 
 
-All models including age fit substantially better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a polynomial function for our subsequent analysis.
+All models including age fit better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a polynomial function for our subsequent analysis.
 
 
 
@@ -392,7 +403,7 @@ eggers.test = function(x) {
 ```
 ``` {r include = FALSE}
 
-eggerstest <- df_shape %>%
+eggerstest <- df_shape_solid %>%
   mutate(y = d/d_var, x = 1/d_var) %>%
   lm(y ~ x, data= .) %>%
   summary()
@@ -402,8 +413,8 @@ eggerscoeff <- tibble(coeff = c(round(coef(eggerstest),2)))
 
 ```{r funnelplot, fig.width= 4, fig.height= 3, out.width ="100%", include=TRUE, fig.cap="The significance funnel plot shows individual effect sizes on the x-axis and corresponding standard error on the y-axis. The diagonal line shows effect sizes that are exactly p = 0.05. Yellow values show affirmative (significant) studies. The diamond shows the estiamte from the meta-analytic model descirbed above."}
 
-PublicationBias::significance_funnel(yi = df_shape$d, 
-                                     vi = df_shape$d_var, 
+PublicationBias::significance_funnel(yi = df_shape_solid$d, 
+                                     vi = df_shape_solid$d_var, 
                                      est_all = coef(mod_poly)[1]) +
   theme(legend.position = "bottom")
 ```
@@ -421,7 +432,7 @@ lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_
                      V = d_var,
                      random = ~ 1 | ID/exp_num, 
                      slab = short_cite, 
-                     data = filter(df_shape, !is.na(exp_num)))
+                     data = df_shape_solid)
 
 mdlcoeff <- tibble(coeff = c(round(coef(lang_model),2)))
 
@@ -445,7 +456,7 @@ writeLines(knitr::kable(lang_model_df,
                         table.attr = "style='width:10%;'"))
 ```
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
 \resizebox{0.5\textwidth}{!}{%
 \begin{tabular}{lrrrrrr}
@@ -461,11 +472,12 @@ Non-IE $\times \text{Age}^2$ & 0.000 & 0.000 & -0.971 & 0.332 & -0.001 & 0.000\\
 \hline
 \end{tabular}
 }
-\caption{Results of the meta-regression model incoroprating both language and age (in months). Non-IE = "Non-Indo-European".}
+\label{tab:lang_model}
+\caption{FIXME Results of the meta-regression model incoroprating both language and age (in months). Non-IE = "Non-Indo-European."}
 \end{table}
 
 
-A model incorporating language group and age as moderators revealed a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`). However, we didn't find a significant difference in the mean effect for the non-Indo-European group. The between-study heterogeneity remained high (in fact with a slight increase in this model; $I^2 = `r round(I2_lang, 2)`$).
+A model incorporating language group and age as moderators revealed a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[4], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[4]`). However, we didn't find a significant difference in the mean effect for the non-Indo-European group. The between-study heterogeneity remained high (in fact with a slight increase in this model; $I^2 = `r round(I2_lang, 2)`$). All coefficients are shown in Table \ref{tab:lang_model}, and Figure \ref{fig:dev-change} shows model fit compared with individual effect size estimates. 
 
 ``` {r include = FALSE}
 tidy_lang_model <- tidy(lang_model)
@@ -480,10 +492,10 @@ coef(summary(lang_model)) |>
 ```
 
 ```{r include = FALSE}
-df_shape_indo <- df_shape %>%
+df_shape_indo <- df_shape_solid %>%
   filter(indoeuropean == TRUE)
 
-df_shape_nonendo <- df_shape %>% 
+df_shape_nonendo <- df_shape_solid %>% 
   filter(indoeuropean == FALSE)
 ```
 
@@ -501,7 +513,7 @@ syntax_model <- rma.mv(d ~ mean_age_months_centered36 * Informative_syntax,
        V = d_var, 
        random = ~ 1 | ID/exp_num,
        slab = short_cite, 
-       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+       data = df_shape_solid)
 
 
 mdlsyntaxcoeff <- tibble(coeff = c(round(coef(syntax_model),2)))
