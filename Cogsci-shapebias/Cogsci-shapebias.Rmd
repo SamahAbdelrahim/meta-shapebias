@@ -75,7 +75,7 @@ A final proposal is that shape bias might in part be a function of exposure to m
 
 ## Dimensions of variation in the shape bias
 
-Across the large literature investigating children’s shape-based generalizations, the magnitude of the observed shape bias varies widely. We next review some of these sources of variation, which guide the research questions that we assess using our meta-analysis. Some – but not all – sources of variation relate to the theoretical proposals about the origins of the shape bias. In addition, the links between observed variation and theory are not always clear and have rarely been stated in quantitative form. In the Discussion, we revisit the question of how to link our meta-analysis to theoretical accounts.
+Across the large literature investigating children’s shape-based generalizations, the magnitude of the observed shape bias. We next review some of these sources of variation, which guide the research questions that we assess using our meta-analysis. Some – but not all – sources of variation relate to the theoretical proposals about the origins of the shape bias. In addition, the links between observed variation and theory are not always clear and have rarely been stated in quantitative form. In the Discussion, we revisit the question of how to link our meta-analysis to theoretical accounts.
 
 First, the shape bias varies developmentally. The shape bias appears to increase at or before the second birthday, continues to increase at the 3rd year until adulthood [@samuelson2008rigid; @landau1988] and perhaps decreases in some other studies. For example, in one study, 3-year-olds showed a strong bias to generalize nouns by shape, while 5-year-olds and adults showed a weaker bias [@landau1998object]. In our meta-analysis, we attempt to quantify developmental change in the magnitude of the bias (Research Question 1).
 
@@ -430,6 +430,7 @@ lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_
                      slab = short_cite, 
                      data = df_shape_solid)
 
+
 mdlcoeff <- tibble(coeff = c(round(coef(lang_model),2)))
 
 #mdlcoeff$coeff[1]
@@ -441,7 +442,7 @@ P_lang<- W_lang - W_lang %*% X_lang %*% solve(t(X_lang) %*% W_lang %*% X_lang) %
 I2_lang <- sum(lang_model$sigma2) / (sum(lang_model$sigma2) + (lang_model$k-lang_model$p)/sum(diag(P_lang)))
 
 
-lang_model_df <- as.data.frame(round(coef(summary(lang_model)), 4))
+lang_model_df <- as.data.frame(round(coef(summary(lang_model)), 3))
 
 kableExtra::kbl(lang_model_df) %>%
   kable_classic_2(full_width = F)
@@ -459,12 +460,12 @@ writeLines(knitr::kable(lang_model_df,
 \hline
   & \bf{$\beta$} & \bf{SE} & \bf{$z$} & \bf{$p$} & \bf{lower CI} & \bf{upper CI}\\
 \hline
-Intercept & 0.756 & 0.088 & 8.637 & <0.001 & 0.584 & 0.927\\
-Age & 0.010 & 0.003 & 2.884 & 0.004 & 0.003 & 0.017\\
-Non-Indo-European & -0.080 & 0.081 & -0.997 & 0.319 & -0.238 & 0.078\\
-$\text{Age}^2$ & -0.001 & 0.000 & -5.201 & 0.000 & -0.001 & 0.000\\
-Age $\times$ Non-IE & -0.012 & 0.007 & -1.639 & 0.101 & -0.027 & 0.002\\
-Non-IE $\times \text{Age}^2$ & 0.000 & 0.000 & -0.971 & 0.332 & -0.001 & 0.000\\
+Intercept & 0.836 & 0.091	 & 9.199 & 0.000 & 0.658 & 1.014\\
+Age & 0.013 & 0.004 & 3.595 & 0.000 & 0.006 & 0.020\\
+Non-Indo-European & -0.182 & 0.092 & -1.974 & 0.048 & -0.362 & -0.001\\
+$\text{Age}^2$ & -0.001 & 0.000 & -5.379 & 0.000 & -0.001 & 0.000\\
+Age $\times$ Non-IE & -0.009 & 0.009 & -1.068	 & 0.286 & -0.026 & 0.008\\
+Non-IE $\times \text{Age}^2$ & 0.000 & 0.000 & 0.117 & 0.907 & -0.001 & 0.001\\
 \hline
 \end{tabular}
 }
@@ -472,8 +473,7 @@ Non-IE $\times \text{Age}^2$ & 0.000 & 0.000 & -0.971 & 0.332 & -0.001 & 0.000\\
 \caption{Results of the meta-regression model incoroprating both language and age (in months). Non-IE = "Non-Indo-European."}
 \end{table}
 
-
-A model incorporating language group and age as moderators revealed a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months of age but the effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[4], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[4]`). However, we didn't find a significant difference in the mean effect for the non-Indo-European group. The between-study heterogeneity remained high (in fact with a slight increase in this model; $I^2 = `r round(I2_lang, 2)`$). All coefficients are shown in Table \ref{tab:langmodel}, and Figure \ref{fig:dev-change} shows model fit compared with individual effect size estimates. 
+A model incorporating language group and age as moderators revealed a significant positive effect size of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European speakers at the age of 36 months, and a significantly less effect size for the non-indo-european group `r round(mdlcoeff$coeff[3], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[3]`). The effect decreases significantly with quadratic age `r round(mdlcoeff$coeff[4], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[4]`). The between-study heterogeneity remained high (in fact with a slight increase in this model; $I^2 = `r round(I2_lang, 2)`$). All coefficients are shown in Table \ref{tab:langmodel}, and Figure \ref{fig:dev-change} shows model fit compared with individual effect size estimates. 
 
 ``` {r  include = FALSE}
 tidy_lang_model <- tidy(lang_model)
