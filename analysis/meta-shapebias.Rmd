@@ -1,0 +1,859 @@
+---
+title: "MA shapbias analysis"
+author: "Samah"
+date: "2023-03-14"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+# Preliminaries and data reading
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+``` {r, message = F}
+# additional libraries
+library("knitr")
+library("janitor")     
+library("broom.mixed") 
+library("lme4")
+library("emmeans")
+library("tidyverse")
+library("kableExtra")
+library("modelr")
+library("broom")
+library("nlme")
+library(wesanderson)
+library("meta")
+library("metafor")
+library("here")
+# library("dmetar")
+library(jtools) # Load jtools
+theme_set(theme_bw())
+```
+
+```{r, message=FALSE}
+#pilot1_data = read_csv("shape_bias_meta.csv")
+#df_shape <- filter(pilot1_data, !is.na(d))
+
+df_shape <- read_csv(here("data","shape_bias_meta.csv")) |>
+  filter(!is.na(d))
+
+df_shape_summary <- df_shape %>%
+  group_by(language) %>%
+  summarize( count = n())
+
+df_shape$englishgrp <- fct_relevel(as.factor(df_shape$language %in% 
+                                                 c("english")), 
+                                     "TRUE")
+
+df_shape <- df_shape %>% group_by(language) %>%
+  mutate(language_grp = case_when(language == "english" ~ "English", 
+                                  language %in% c("chinese","japanese", "korean", 
+                                                  "vietnamese") ~  "East Asian",
+                                  language %in% c("spanish", 
+                                                  "german") ~ "Indo-European", 
+          TRUE ~ "Tsimane"))
+
+
+df_shape$mean_age_months_centered36 <- df_shape$mean_age_months - 36
+df_shape$log_mean_age_months <- log(df_shape$mean_age_months)
+
+df_shape$indoeuropean <- fct_relevel(as.factor(df_shape$language %in% 
+                                                 c("english","spanish", "german")), 
+                                     "TRUE")
+
+df_shape_indo <- df_shape %>%
+  filter(indoeuropean == TRUE)
+
+df_shape_nonendo <- df_shape %>% 
+  filter(indoeuropean == FALSE)
+
+df_shape_solid <- df_shape %>% 
+  filter(solid != "substance")
+```
+
+# Initial exploration
+
+First, Visualizing the data to have an initial idea of how it looks.
+
+First dividing the language group into two groups: the first one is the indo-european group which includes the English and the Spanish languages. The second group includes the rest of the languages: Japanese, Chinese, Tsimane.
+
+``` {r, eval = T, message = F}
+
+# creating a plot that shows the effects sizes colored per language group as well as the polynomial regression curve that fits it. 
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = indoeuropean)) + geom_point(aes(ymin = d - d_var, ymax = d + d_var, 
+                                                                           alpha = .5, size = part_num)) + 
+  geom_smooth(aes(group = indoeuropean, 
+                  lty  = indoeuropean), 
+              col = "black",
+              method = "lm", se = TRUE,
+              formula = y ~ poly(x,2)) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Indo-Euro language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  theme_classic(base_size = 8)
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5, size = 0.3) + 
+  geom_smooth(aes(group = indoeuropean, 
+                  lty  = indoeuropean), 
+              col = "black",
+              method = "lm", se = TRUE,
+              formula = y ~ poly(x,2)) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  theme_classic(base_size = 8)
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5, size = 0.3) + 
+  geom_smooth(aes(group = indoeuropean, 
+                  lty  = indoeuropean), 
+              col = "black",
+              method = "lm", se = TRUE,
+              formula = y ~ x) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  theme_classic(base_size = 8)
+
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language_grp))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5, size = 0.3) + 
+  geom_smooth(aes(group = language_grp, weight =1/d_var), 
+              method = "lm", se = FALSE, 
+              formula = y ~ x) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  theme_classic(base_size = 8)
+
+
+
+# ggsave("first graph.png", width = 7, height = 4)
+
+barplot(table(df_shape$language), main = "barplot")
+length(which(df_shape$language=="english"))
+
+ggplot(df_shape_summary, aes(x = language, y = count)) +
+  geom_col(aes(color = language), ) + 
+  theme(legend.position = "none")  +
+  geom_text(aes(label = count), vjust = -0.2)
+
+
+```
+
+```{r}
+
+
+# creating a plot that shows the effects sizes colored per language group as well as the polynomial regression curve that fits it. 
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5) + 
+  geom_smooth(aes(group = englishgrp, 
+                  lty  = englishgrp), 
+              col = "black",
+              method = "lm", se = FALSE,
+              formula = y ~ poly(x,2)) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "English") +
+  theme(legend.position = "bottom") +
+  theme_minimal(base_size = 8)
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language)) + 
+  geom_point(aes(ymin = d - d_var, ymax = d + d_var, 
+                  alpha = .5, size = part_num))  +
+  geom_smooth(data = filter(df_shape, language == "chinese"), 
+              col = "black",
+              method = "lm", se = FALSE) + 
+  geom_smooth(data = filter(df_shape, language == "english"), 
+              col = "black",
+              method = "lm", se = FALSE)
+
+```
+
+# Basic meta-analysis
+
+## `metagen` approach
+
+using the meta-analytic function meta-gen which calculates the weights for each effects and confidence interval, pooled effect size, the heterogeneity.
+
+``` {r}
+m.gen <- metagen( TE= d, 
+                  seTE = d_var, 
+                  studlab = ID, 
+                  data = df_shape, 
+                  sm = "SMD", 
+                  fixed = FALSE, 
+                  random = TRUE, 
+                  method.tau = "REML", 
+                  hakn = TRUE, 
+                  title = "pilot shape bias meta-analysis"
+                  
+)
+
+# summary(m.gen)['TE']
+# m.gen["TE.fixed"]
+# m.gen["TE.random"]
+# m.gen["w.random"]
+```
+### only solid objects: 
+``` {r}
+m.gen_solid <- metagen( TE= d, 
+                  seTE = d_var, 
+                  studlab = ID, 
+                  data = df_shape_solid, 
+                  sm = "SMD", 
+                  fixed = FALSE, 
+                  random = TRUE, 
+                  method.tau = "REML", 
+                  hakn = TRUE, 
+                  title = "pilot shape bias meta-analysis")
+```
+
+forest plot using the m-gen function object
+
+```{r}
+forextobj <- forest.meta(m.gen, 
+                         sortvar = TE, 
+                         prediction = TRUE, 
+                         print.tau2 = FALSE, 
+                         leftlabs = c("Author", "g", "SE"))
+```
+
+forest plot from the rma model
+
+## `metafor` approach
+
+using rma.mv instead of m.gen
+
+```{r }
+mod <- rma.mv(yi = d, 
+              V = d_var, 
+              random = ~ 1 | ID,
+              slab = short_cite, 
+              data = df_shape)
+summary(mod)
+```
+
+Nested model. 
+
+```{r}
+mod_nested <- rma.mv(yi = d, 
+                     V = d_var, 
+                     random = ~ 1 | ID/exp_num,
+                     slab = short_cite, 
+                     data = filter(df_shape, !is.na(exp_num)))
+
+summary(mod_nested)
+ 
+
+#caluculating the heterogeneity from this website: https://www.metafor-project.org/doku.php/tips:i2_multilevel_multivariate 
+
+W <- diag(1/mod_nested$vi)
+X <- model.matrix(mod_nested)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * sum(mod_nested$sigma2) / (sum(mod_nested$sigma2) + (mod_nested$k-mod_nested$p)/sum(diag(P)))
+```
+
+Forest plot from `metafor`.
+
+``` {r}
+forest(mod) +
+  theme_minimal(base_size = 8)
+
+
+forest(mod_nested, xlim=c(-16, 4.6), at=log(c(0.05, 0.25, 1, 4)), atransf=exp)
+```
+
+Try this using ggplot
+
+```{r, eval=FALSE, include=FALSE}
+forest_data <-tibble(yi = mod$yi,
+                     se = sqrt(mod$vi), 
+                     slab = mod$slab)
+
+ggplot(forest_data, 
+       aes(x = slab, y = yi)) +
+  geom_pointrange(aes(ymin = yi - se, ymax = yi + se)) + 
+  geom_hline(yintercept = 0, lty = 2) +
+  coord_flip() 
+
+
+# 
+# theme_set(theme_bw(base_size=10))
+# ata.frame(ES=ROM.ma$b,SE=ROM.ma$se,Type="Summary",Study="Summary"))
+# forrest_data$Study2<-factor(forrest_data$Study, levels=rev(levels(forrest_data$Study)) )
+# levels(forrest_data$Study2)
+# plot1<-ggplot(data=forrest_data,aes(x=Study2,y=ES,ymax=ES+(1.96*SE),ymin=ES-(1.96*SE),size=factor(Type),colour=factor(Type)))+geom_pointrange()
+# plot2<-plot1+coord_flip()+geom_hline(aes(x=0), lty=2,size=1)+scale_size_manual(values=c(0.5,1))
+# plot3<-plot2+xlab("Study")+ylab("log response ratio")+scale_colour_manual(values=c("grey","black"))
+# plot3+theme(legend.position="none")
+
+
+```
+
+
+## Revised forest plot
+
+```{r, eval=TRUE}
+
+ggplot(df_shape, aes(x = short_cite, y = d, 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange( alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = m.gen ,yintercept = m.gen$TE.random, color = "red") +
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation") +
+  theme_minimal(base_size = 8)
+
+
+ #+geom_text(aes(1.5,m.gen$TE.random,label = round(m.gen$TE.random,2), color = "darkred", size = 0.01 ))
+
+ggplot(df_shape, aes(x = short_cite, y = d, 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange(aes(color=indoeuropean), alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = m.gen ,yintercept = m.gen$TE.random) +
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation") +
+  theme_minimal(base_size = 8)
+
+#png("secondgraph.png")
+```
+## Forest plot with solidity:
+```{r}
+ggplot(df_shape, aes(x = short_cite, y = d, 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange(aes(color=solid), alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = m.gen ,yintercept = m.gen$TE.random) +
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation") +
+  theme_minimal(base_size = 8)
+
+
+ggplot(df_shape, aes(x = short_cite, y = d, 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange(aes(color=solidity), alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = m.gen ,yintercept = m.gen$TE.random) +
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation") +
+  theme_minimal(base_size = 8)
+#png("secondgraph.png")
+```
+
+```{r}
+## only solidity: 
+
+ggplot(df_shape_solid, aes(x = short_cite, y = d, 
+                     ymin=d-sqrt(d_var)*1.96,
+                     ymax=d+sqrt(d_var)*1.96)) + 
+  geom_pointrange(aes(color=solidity), alpha = .5, position=position_dodge2(width=.5)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_hline(data = m.gen ,yintercept = m.gen_solid$TE.random) +
+  aes(x=reorder(short_cite,-d, sum)) +  
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Citation") +
+  theme_minimal(base_size = 8)
+
+
+m.gen_solid
+m.gen
+```
+
+## Publication bias
+
+```{r}
+
+col.contour = c("gray75", "gray85", "gray95")
+
+funnel(m.gen, 
+       comb.random = TRUE,
+       xlim = c(-3, 6),
+       ylim = c(1.05, -0.05),
+       contour = c(0.9, 0.95, 0.99),
+       col.contour = col.contour)
+
+regtest(x = d, vi = d_var,
+        data = df_shape)
+
+# Add a legend
+legend(x = 3.3, y = 0.1, cex = 0.5,
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour)
+
+#png("funnel.png")
+
+funnel(mod_nested, main="Standard Error")
+legend(x = 3.3, y = 0.1, cex = 0.5,
+       legend = c("p < 0.1", "p < 0.05", "p < 0.01"),
+       fill = col.contour)
+#funnel(mod_nested, yaxis="seinv", main="Inverse Standard Error")
+
+```
+
+funnel plots using ggplot to account for moderators:
+
+``` {r}
+x = summary(m.gen)['TE']
+y = summary(m.gen)['seTE']
+m.gen["TE.fixed"]
+ter = m.gen["TE.random"]
+
+
+data.gen = data.frame(x,y,ter)
+
+ggplot(data = data.gen, mapping = aes(x=TE, y = seTE, color= )) +
+  geom_point() +
+  geom_vline(xintercept = 0.4418062) +
+  scale_y_reverse()
+
+ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= indoeuropean)) +
+  geom_point() +
+  geom_vline(xintercept = 0.5401759) +
+  scale_y_reverse()
+
+
+ggplot(data = df_shape, mapping = aes(x=d, y = d_var, color= language)) +
+  geom_point() +
+  geom_vline(xintercept = 0.5401759) +
+  scale_y_reverse() +
+  geom_smooth(method = "lm")
+
+```
+
+## Eggers regresstion test
+
+``` {r}
+m.gen$data %>%
+  mutate(y = m.gen$TE/m.gen$seTE, x = 1/m.gen$seTE) %>%
+  lm(y ~ x, data= .) %>%
+  summary()
+
+#eggers regression
+ggplot(data = data.gen, mapping = aes(x=1/seTE, y = TE/seTE, color= )) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ggplot(data = df_shape, mapping = aes(x=d_var, y = d/d_var, color= indoeuropean)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+# eggers.test(m.gen)
+
+
+```
+
+using rma.mv instead of m.gen
+
+```{r }
+mod <- rma.mv(yi = d, 
+                  V = d_var, 
+                  random = ~ 1 | ID,
+                  slab = short_cite, 
+                  data = df_shape)
+
+mod_nested <- rma.mv(yi = d, 
+                  V = d_var, 
+                  random = ~ 1 | ID/exp_num,
+                  slab = short_cite, 
+                  data = filter(df_shape, !is.na(exp_num)))
+
+summary(mod)
+summary(mod_nested)
+
+```
+
+plotting coefficients from the rmv model:
+assuming that those coefficients correspond to effect sizes
+
+# Confirmatory analysis
+
+For primary analyses, i will exclude effect sizes from clinical populations and multilingual populations.
+
+I will investigate the hypotheses via multi-level meta-regressions using the metafor package.
+
+In all models, I will include random effects that control for non-independence between effect sizes based on grouping by paper and grouping by experiment.
+
+I will first fit:
+Shape bias ~ 1
+Shape bias ~ age
+shape bias ~ log(age)
+shape bias ~ poly(age,2)
+
+### intercept:
+
+``` {r}
+# using the meta and metafor packages to analyze meta-analysis effect sizes
+mod_intercept <- rma.mv(d ~ 1, 
+                        V = d_var,
+                        random = ~1 | as.factor(Title) / 
+                          as.factor(exp_num), 
+                        slab = Title, 
+                        data = filter(df_shape, !is.na(exp_num))) 
+
+
+mod_intercept_nonindo <- rma.mv(d ~ 1, 
+                        V = d_var,
+                        random = ~1 | as.factor(Title) / 
+                          as.factor(exp_num), 
+                        slab = Title, 
+                        data = filter(df_shape_nonendo, !is.na(exp_num))) 
+
+mod_intercept_indo <- rma.mv(d ~ 1, 
+                        V = d_var,
+                        random = ~1 | as.factor(Title) / 
+                          as.factor(exp_num), 
+                        slab = Title, 
+                        data = filter(df_shape_indo, !is.na(exp_num))) 
+
+summary(mod_intercept_nonindo)
+summary(mod_intercept)
+```
+
+### age
+
+```{r}
+
+mod_age <- rma.mv(d ~ mean_age_months_centered36, 
+                  V = d_var,
+                  random = ~1 | as.factor(Title) / 
+                    as.factor(exp_num), 
+                  slab = Title, 
+                  data = filter(df_shape, !is.na(exp_num)))
+
+mod_age_indo <- rma.mv(d ~ mean_age_months_centered36, 
+                  V = d_var,
+                  random = ~1 | as.factor(Title) / 
+                    as.factor(exp_num), 
+                  slab = Title, 
+                  data = filter(df_shape_indo, !is.na(exp_num)))
+summary(mod_age)
+summary(mod_age_indo)
+```
+### log age
+
+```{r}
+
+mod_log_age <- rma.mv(d ~ log_mean_age_months, 
+                      V = d_var,
+                      random = ~1 | as.factor(Title) / 
+                        as.factor(exp_num), 
+                      slab = Title, 
+                      data = filter(df_shape, !is.na(log_mean_age_months) , !is.na(exp_num)))
+
+mod_log_age_indo <- rma.mv(d ~ log_mean_age_months, 
+                      V = d_var,
+                      random = ~1 | as.factor(Title) / 
+                        as.factor(exp_num), 
+                      slab = Title, 
+                      data = filter(df_shape_indo, !is.na(log_mean_age_months) , !is.na(exp_num)))
+
+summary(mod_log_age)
+summary(mod_log_age_indo)
+```
+
+Let's look at what this means:
+
+```{r}
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d, color = language))+
+  geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), 
+                  alpha = .5) + 
+  geom_smooth(aes(group = 1), 
+              col = "black",
+              method = "lm", se = FALSE,
+              formula = y ~ log(x)) +
+    geom_smooth(aes(group = 1), 
+              col = "red",
+              method = "lm", se = FALSE,
+              formula = y ~ poly(x,2)) + 
+  geom_smooth(aes(group = 1), 
+              col = "blue",
+              method = "lm", se = FALSE,
+              formula = y ~ x) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") +
+  scale_color_discrete(name = "Language") +
+  scale_linetype_discrete(name = "Indo-European") +
+  theme(legend.position = "bottom") + 
+  xlim(0,80)
+
+
+
+ggplot(df_shape,
+       aes(x = mean_age_months, y = d))+ 
+  geom_smooth(aes(group = 1), 
+              col = "black",
+              method = "lm", se = FALSE,
+              formula = y ~ log(x), show.legend = TRUE) +
+    geom_smooth(aes(group = 1), 
+              col = "red",
+              method = "lm", se = FALSE,
+              formula = y ~ poly(x,2)) + 
+  geom_smooth(aes(group = 1), 
+              col = "blue",
+              method = "lm", se = FALSE,
+              formula = y ~ x) +
+  geom_hline(yintercept = 0, lty = 3) + 
+  ylab("Standardized Mean Difference (d)") + 
+  xlab("Mean age (months)") 
+```
+
+### polynomial age
+
+```{r}
+mod_poly_nonindo <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2), 
+                   V = d_var,
+                   random = ~1 | as.factor(ID) / 
+                     as.factor(exp_num), 
+                   slab = Title, 
+                   data = filter(df_shape_nonendo, !is.na(log_mean_age_months), !is.na(exp_num)))
+
+mod_poly_indo <- rma.mv(d ~ mean_age_months_centered36 + I(mean_age_months_centered36^2), 
+                   V = d_var,
+                   random = ~1 | as.factor(ID) / 
+                     as.factor(exp_num), 
+                   slab = Title, 
+                   data = filter(df_shape_indo, !is.na(log_mean_age_months), !is.na(exp_num)))
+
+summary(mod_poly_nonindo)
+summary(mod_poly_indo)
+```
+
+
+### model comparison and plotting AICc , what is the criteria ? cutoff
+
+```{r, eval=FALSE, include=FALSE}
+#anova(mod_log_age, mod_poly, refit = TRUE)
+#anova(mod_age, mod_poly) ## the two models are not comparable, not nested
+
+#plot_component(mod, type = "BIC")
+summary(mod_intercept)$fit.stats[5,'REML']
+AIC_vector <- c(summary(mod_intercept)$fit.stats[5,'REML'],
+                summary(mod_age)$fit.stats[5,'REML'], 
+                summary(mod_log_age)$fit.stats[5,'REML'],
+                summary(mod_poly)$fit.stats[5,'REML'])
+
+# AIC_vector <- c(AICc(mod_intercept), AICc(mod_age), AICc(mod_log_age), AICc(mod_poly))
+
+models <- c("intercept", "age", "logage", "polyage")
+
+data.AIC = data.frame(AIC_vector, modelnames)
+
+ggplot(data = data.AIC, mapping = aes(x = AIC_vector, y = models, color = models)) +
+  geom_point()
+
+# png("modelAIC.png")
+# ggsave("modelAIC.png")
+
+```
+
+## Polynomial age models
+
+Let's start with an interaction with `indoeuropean` with standard quadratic terms. This model is very interpretable. 
+
+```{r, include=TRUE}
+rma.mv(d ~ mean_age_months_centered36 * indoeuropean + 
+         I(mean_age_months_centered36^2) * indoeuropean, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+
+
+rma.mv(d ~ mean_age_months_centered36 * indoeuropean , 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+
+
+rma.mv(d ~ mean_age_months_centered36 * indoeuropean + Informative_syntax , 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+
+
+```
+
+Next try breaking down by language. Here we can see Spanish is sparse and has a huge interaction term for some reason. Probably just overfit.
+
+```{r, eval=FALSE, include=FALSE}
+rma.mv(d ~ mean_age_months_centered36 * language + 
+         I(mean_age_months_centered36^2) * language, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language), i))
+```
+With the orthogonal polynomials, it blows up completely. 
+
+```{r, eval=FALSE, include=FALSE}
+rma.mv(d ~ poly(mean_age_months_centered36,2) * language,
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+```
+here is the same model but changing the contrasts:
+
+```{r, eval=FALSE, include=FALSE}
+df_shape$lang_factor <- as.factor(df_shape$language)
+# contrasts(df_shape$lang_factor) <- contr.treatment(6, base = 2)
+df_shape$lang_factor <- fct_relevel(df_shape$lang_factor, "english", after = Inf)
+contrasts(df_shape$lang_factor) <- contr.sum(6)*0.5
+
+#1:chinese, 2:german, 3:japanese, 4:spanish, 5:tsimane
+
+rma.mv(d ~ mean_age_months_centered36 * lang_factor + 
+         I(mean_age_months_centered36^2) * lang_factor, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(lang_factor)))
+```
+
+a model that tests for bias ~ age * syntax
+
+``` {r}
+rma.mv(d ~ mean_age_months_centered36 * Informative_syntax , 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+```
+checking the solidity with age : bias ~ exemplar type * age
+
+``` {r}
+rma.mv(d ~ mean_age_months_centered36 * solidity , 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+
+```
+
+checking syntax with solidity, not in the preregistration:
+
+``` {r}
+
+
+```
+
+syntax with count-mass nouns:
+
+``` {r}
+
+rma.mv(d ~ mean_age_months_centered36 + solidity * Informative_syntax, 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language)))
+```
+# alternative grouping
+## English , Est Asian , european industrialized , other  :
+```{r results = 'asis'}
+
+mod <- rma.mv(d ~ mean_age_months_centered36 * language_grp , 
+       V = d_var, 
+       random = ~ 1 | ID/exp_num,
+       slab = short_cite, 
+       data = filter(df_shape, !is.na(exp_num), !is.na(language))) 
+
+rownames(mod$coef) <- c("intercept", "age", "east asian", " indo-european", "Tsimane", "Age * East Asian" , "Age * Indo_European", " Age * Tsiimane ")
+
+# tab_model(mod, pred.labels = c("intercept", "age", "east asian", " indo-european", "Tsimane", "Age * East Asian" , "Age * Indo_European", " Age * Tsiimane "), 
+#           dv.labels = "model")
+
+
+coef(summary(mod)) |>
+  kable(digits = 3)
+
+```
+
+```{r  results = 'asis'} 
+mod <- rma.mv(d ~ mean_age_months_centered36 * language_grp , 
+              V = d_var, random = ~ 1 | ID/exp_num, 
+              slab = short_cite, 
+              data = filter(df_shape, !is.na(exp_num))) 
+
+summary(mod)
+
+tidy_summary <- tidy(mod)
+tidy_summary %>% kable()
+
+
+coef(summary(mod)) |> 
+  papaja::apa_table() 
+```
+##syntax 
+``` {r}
+mod_syntax <- rma.mv(d ~ mean_age_months_centered36 * Informative_syntax , 
+              V = d_var, random = ~ 1 | ID/exp_num, 
+              slab = short_cite, 
+              data = filter(df_shape, !is.na(exp_num))) 
+
+summary(mod_syntax)
+```
+# Discussion
+
+
+# References
+
+
+
