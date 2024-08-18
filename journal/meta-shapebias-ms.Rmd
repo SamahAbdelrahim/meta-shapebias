@@ -1,6 +1,6 @@
 ---
 title             : "Examining the robustness and generalizability of the shape bias: a meta-analysis"
-shorttitle        : "The shape bias meta Analysis"
+shorttitle        : "SHAPE BIAS META-ANALYSIS"
 
 author: 
   - name          : "Samah Abdelrahim"
