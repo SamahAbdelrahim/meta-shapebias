@@ -113,13 +113,13 @@ A final proposal is that shape bias might in part be a function of exposure to m
 
 Across the large literature investigating children's shape-based generalizations, the magnitude of the observed shape bias varies widely. We next review some of these sources of variation, which guide the research questions that we assess using our meta-analysis. Some -- but not all -- sources of variation relate to the theoretical proposals about the origins of the shape bias. These links between observed variation and theory are not always clear and have rarely been stated in quantitative form. In the Discussion, we revisit the question of how to link our meta-analysis to the theoretical accounts described above.
 
-First, the shape bias varies developmentally, However, the trajectory of the change is not robuslty mapped. For example, it appears to increase at or before the second birthday, continues to increase at the 3rd year until adulthood in some studies [@samuelson2008rigid; @landau1988;@jara2022;] and perhaps decreases in some others. For example, in one study, 3-year-olds showed a strong bias to generalize nouns by shape, while 5-year-olds and adults showed a weaker bias [@landau1998object; @subrahmanyam_2006;@imai_childrens_1994]. Age differences were also a function of the specifics of the task, condition, and items used [@imai1997; @graham1999function; @dumb_mechanism1996; @booth2005conceptual]. In our meta-analysis, we attempt to quantify developmental change in the magnitude of the bias (Research Question 1).
+First, the shape bias varies developmentally, However, the trajectory of the change is not robuslty mapped. For example, it appears to increase at or before the second birthday, continues to increase at the 3rd year until adulthood in some studies [@samuelson2008rigid; @landau1988;@jara2022;] and perhaps decreases in some others. For example, in one study, 3-year-olds showed a strong bias to generalize nouns by shape, while 5-year-olds and adults showed a weaker bias [@landau1998object; @subrahmanyam_2006;@imai_childrens_1994]. Age differences were also a function of the specifics of the task, condition, and items used [@imai1997; @graham1999function; @dumb_mechanism1996; @booth2005conceptual;@Subrahmanyam1999_age_complex]. In our meta-analysis, we attempt to quantify developmental change in the magnitude of the bias (Research Question 1).
 
 Second, studies on the shape bias have been conducted across a variety of languages and cultures that vary in their mass/count syntax, other linguistic properties, and many cultural dimensions including environment and industrialization. Speakers of Eastern Asian languages such as Japanese and Mandarin have been claimed to show a reduced tendency to rely on shape for word extension [@gathercole_1997; @imai1997; @jara2022; @samuelson1999; @soja1991ontological; @subrahmanyam_2006; @yoshida2003; @imai2010; @tran2012honoring; @CANTRELL2013258]. The intersection of cross-linguistic and developmental variation adds another layer of complexity. In one study, English- and Mandarin-speaking 3-year-olds generalized by shape. In contrast, Mandarin-speaking 4-year-olds and adults generalized by material while English-speaking 4-year-olds and adults showed a preference for shape [@subrahmanyam_2006]. As is common in cross cultural/cross-linguistic research, observed variation across populations can be difficult to interpret due to the myriad correlated cultural and linguistic factors that differ between populations. We attempt to quantify evidence of cross-cultural differences across ages (Research Question 2).
 
 Third, studies vary significantly in their procedures, stimuli, and comparison dimensions. For example, two-year-olds were found to generalize by shape in the case of artifacts, while relying on both shape and texture in the case of animate objects [@booth2005conceptual; @yoshida2003]. On the other hand, when given information about objects' function, preschool children reportedly used shape to generalize the noun label, while older children were more likely to use function [@graham1999; @gentner_1978; @smith_naming_1996; @landau1998object]. Likewise, shape bias was found to be more prevalent with three dimensional objects than two dimensional ones [@davidson2018effects], and dissipated altogether when children were no longer forced to choose between test objects [@cimpian2005absence].
 
-The shape bias is thought to be a distinctive extension strategy for solid objects, but it is also reported to be mediated by boundary between complex and simple objects. English and Japanese-speaking children are found to prioritize shape for complex industrial artifacts with clear functions. Only Japanese children, however, were claimed to show reduced shape generalization for simple uniform objects with no clear function [@imai1997; @gentner_1978; @srinivasan2019_polysemy; ]. However, Functionality and complexity are used intercheably in the literature. Thus, we also attempt to evaluate the relationship between complexity of objects and the propensity to generalize by shape (Research Question 3).
+The shape bias is thought to be a distinctive extension strategy for solid objects, but it is also reported to be mediated by the perceptual boundary between complex and simple objects. For example, English and Japanese-speaking children are found to prioritize shape for complex industrial artifacts with clear functions. Only Japanese children, however, were claimed to show reduced shape generalization for simple uniform objects with no clear function [@imai1997; @gentner_1978; @srinivasan2019_polysemy; @Sandhofer2004_complex; @cook2006_bilingual_complex]. While in other studies the complexity of objects elicited a lower effect, and perhaps was unrelated [@cimpian2005absence; @potrzeba2015_ASD]. Two main points must be noted here, the first is that the notion of object complexity doesn't have a clear and explicitly shared definition. The second is that functionality and complexity are used interchangeably in the literature. For example, in one study, the authors used the term "complex" to refer to industrial objects with a clear function, while in other studies, the same term was used to refer to objects' number of parts, corners, boundaries, curvature, and richness of details, regardless of its industrial and functional status [@imai1997; @gentner_1978; @SON2008_complex; @Subrahmanyam1999_age_complex]. Thus, we also attempt to evaluate the relationship between complexity of objects and the propensity to generalize by shape (Research Question 3).
 
 Finally, the syntax used in the presentation of stimuli varies across experiments. Some experimental procedures explicitly use mass/count marking to manipulate generalization, while other procedures avoid syntactic marking [@soja1991ontological; @imai1997; @samuelson2008rigid; @soja_perception_1992; @perry2011shape; @horst2013s; @dansereau2017young]. Again, sensitivity to mass/count syntax might vary developmentally; in some studies, younger children showed more sensitivity to syntax that is incongruent with the target [e.g., using count syntax with substances; @soja_1992]. We attempt to quantify the effects of syntax and its interaction with development (Research Question 4). 
 
@@ -167,9 +167,9 @@ Except where noted, all hypotheses, literature search criteria, and statistical 
 ## Literature search
 
 We created an initial set of papers based on google scholar searches using the key words "shape bias", "word generalization", "word learning" combined,
-and citations of two papers [@landau1988; @imai1997]. Figure \ref{fig:prisma} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
+and citations of two papers [@landau1988; @imai1997]. In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
 
-```{r prisma, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
+```{r prisma, eval= FALSE, include= FALSE, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
 knitr::include_graphics("prisma.png")
 ```
 
@@ -178,18 +178,32 @@ In total, 161 papers were found. We filtered these first via titles and abstract
 2. The experiment must include participants less than 5 years old,
 3. The experiment must use a word extension task that contrasts shape with other properties of the referent. 
 
+```{r prisma2}
+prisma2 <- PRISMAstatement::prisma(found = 154,
+       found_other = 22,
+       no_dupes = 176, 
+       screened = 176 , 
+       screen_exclusions = 52, 
+       full_text = 124,
+       full_text_exclusions = 31, 
+       qualitative = 93,
+       quantitative = 93)
+prisma2
+```
 
-```{r prisma , eval= FALSE, include=FALSE,fig.height = 3.5, fig.width= 3, out.width = "100%", fig.cap="PRISMA diagram showing the results of our literature screening process.", dev='png'}
+```{r prisma ,fig.height = 3.5, fig.width= 3, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
+#out.width = "100%"
+#dev='png'
 #from https://cran.r-project.org/web/packages/PRISMAstatement/vignettes/PRISMA.html
-prisma(found = 164,
-       found_other = 0,
-       no_dupes = 164, 
-       screened = 161 , 
-       screen_exclusions = 91, 
-       full_text = 73,
-       full_text_exclusions = 26, 
-       qualitative = 47,
-       quantitative = 47)
+prisma <- PRISMAstatement::prisma(found = 154,
+       found_other = 22,
+       no_dupes = 176, 
+       screened = 176 , 
+       screen_exclusions = 52, 
+       full_text = 124,
+       full_text_exclusions = 31, 
+       qualitative = 93,
+       quantitative = 93)
 
 ```
 
