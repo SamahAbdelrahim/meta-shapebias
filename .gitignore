@@ -10,3 +10,5 @@ rsconnect
 .RData
 .Ruserdata
 *cache*
+.mustread.bib
+.Rapp.history
