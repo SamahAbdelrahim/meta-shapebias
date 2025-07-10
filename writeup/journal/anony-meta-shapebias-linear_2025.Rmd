@@ -72,7 +72,6 @@ knitr::opts_chunk$set(fig.crop = TRUE,
 ```{r, libraries}
 library(png)
 library(grid)
-library(ggplot2)
 library(xtable)
 library(tidyverse)
 library(papaja)
@@ -166,8 +165,7 @@ Except where noted, all hypotheses, literature search criteria, and statistical 
 
 ## Literature search
 
-We created an initial set of papers based on google scholar searches using the key words "shape bias", "word generalization", "word learning" combined,
-and citations of two papers [@landau1988; @imai1997]. In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
+We created an initial set of papers to screen for inclusion in the meta-analysis. We based this set on the combined output of google scholar searches using the key words "shape bias", "word generalization", "word learning" combined. We also performed forward citation searches of two foundational papers in this literature: @landau1988 and @imai1997, In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma2} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
 
 ```{r prisma, eval= FALSE, include= FALSE, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
 knitr::include_graphics("prisma.png")
@@ -207,7 +205,7 @@ prisma <- PRISMAstatement::prisma(found = 154,
 
 ```
 
-Applying these criteria resulted in `r length(unique(df_shape$ID))` papers that both satisfied our criteria and reported enough information to calculate the effect size (ES), either by directly reporting the ES, reporting the proportion of choosing shape in text, tables, graphs; or reporting a statistical test (typically a comparison of shape bias against chance using a test such as  a one sample $t$-test). 
+Applying these criteria resulted in `r length(unique(df_shape$ID))` papers that both satisfied our criteria and reported enough information to calculate an effect size (ES) relating to one or more experimental conditions. An ES could be directly reported or could be computed based on reporting of the proportion of choosing shape in text, tables, graphs; or reporting a statistical test (typically a comparison of shape bias against chance using a test such as a one sample $t$-test). 
 
 ```{r main_model, include=FALSE}
 mod <- rma.mv(yi = d, 
@@ -364,12 +362,14 @@ df_shape %>%
 
 ## Coding of effect size and moderators
 
-The shape bias is typically assessed through word extension tasks [@landau1988]. In this task, children are shown a novel object labeled with a novel noun such as a "dax" and then presented with test objects varying in shape, asked if each is a "dax." Most studies use forced choice or endorsement tasks where children judge objects based on category membership.
-We coded the effect size as the standardized mean difference (Cohen's $d$) between the proportion of children who extended the label to shape-matching objects compared with other properties (e.g., color, texture, or material). In the case of forced-choice tasks, the effect size was calculated against chance, depending on the number of choices. In the case of endorsement tasks, the effect size was calculated as the difference between the proportion of children who extended the label to shape-matching objects compared with other properties (e.g., color, texture, or material).
+The shape bias is typically assessed through word extension tasks [@landau1988]. In this task, children are shown a novel object labeled with a novel noun such as a "dax", presented with test objects varying in shape, and asked if each is a "dax." Most studies use either forced choice or endorsement tasks where children judge objects based on category membership.
+
+We coded the effect size for each experimental condition as the standardized mean difference (Cohen's $d$) between the proportion of children who extended the label to shape-matching objects compared with other properties (e.g., color, texture, or material). In the case of forced-choice tasks, the effect size was calculated against chance, depending on the number of choices. In the case of endorsement tasks, the effect size was calculated as the difference between the proportion of children who extended the label to shape-matching objects compared with other properties (e.g., color, texture, or material).
+
 We coded the variance of each effect size using the formula for Cohen's $d$ [@higgins2003].
 Because many of the papers we coded were decades old, reporting standards varied considerably. Additionally, because studies often included multiple age groups, different types of stimuli, and various manipulations, one experiment usually yielded more than one effect size, and often papers included multiple experiments. Estimation of effect sizes followed this order of precedence: If the paper reported Cohen's d, we used it directly (N=`r sum(df_shape$extraction == "reported")`). If the Cohen's d was not reported, we looked for test statistics (N=`r sum(df_shape$extraction == "t-test")`). In the absence of this information, we used proportions reported in text and tables (N=`r sum(df_shape$extraction == "table")`), or graphs (N=`r sum(df_shape$extraction == "graph")`) along with the standard deviation SD or the standard error SE. In the absence of reported SD or SE, we computed these via standard formulae.
 
-For each effect size, we coded the following moderators: participant age; number of participants; type of syntax used -- informative (count/mass) or neutral^[We additionally coded whether common or proper noun syntax was used and (if applicable) whether animate or inanimate syntax was used, but both of these were sparsely used and we do not discuss them further.];  alternative test objects properties (e.g., shape, color, material); nature of the stimuli: solidity, animacy, and whether they were two- or three-dimensional; type of exposure before testing (whether the child saw multiple training examples of the target object, or just a single example); child's vocabulary size; country of test and language spoken by participants; response mode (grasping, pointing, or verbalizing); measured behavior (e.g., behavioral, eye tracking); population type (typically developing or not); total number of trials. (Effect sizes are estimated across different groups of contrasting properties: shape vs color, material, function etc.).
+For each effect size, we attempted to code the following moderators: participant age; number of participants; type of syntax used -- informative (count/mass) or neutral^[We additionally coded whether common or proper noun syntax was used and (if applicable) whether animate or inanimate syntax was used, but both of these were sparsely used and we do not discuss them further.]; alternative test objects properties (e.g., shape, color, material); nature of the stimuli: solidity, animacy, and whether they were two- or three-dimensional; type of exposure before testing (whether the child saw multiple training examples of the target object, or just a single example); child's vocabulary size; country of test and language spoken by participants; response mode (grasping, pointing, or verbalizing); measured behavior (e.g., behavioral, eye tracking); population type (typically developing or not); total number of trials. (Effect sizes are estimated across different groups of contrasting properties: shape vs color, material, function etc.).
 
 ```{r include=FALSE}
 n_bilingual <- sum(df_shape$monolingual == "bilingual", na.rm=TRUE)
@@ -381,16 +381,16 @@ df_shape <- filter(df_shape,
 ```
 
 For our preregistered analyses, we excluded effect sizes from clinical populations (N=`r n_atypical`) and multilingual populations (N=`r n_bilingual`), though these effect sizes remain in the data file we provide.
-Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while Japanese was the closest language with only `r sum(df_shape$language == "japanese")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
+Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while Japanese included only `r sum(df_shape$language == "japanese")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
 The final coded sample consisted of `r length(unique(df_shape$ID))` papers with `r nrow(df_shape)` effect sizes. 
 
 ## Analytic approach
 
-All analyses were performed using the `metafor` package in R [@viechtbauer2010]. We pooled effect sizes using a multi-level meta analysis model with effect size nested within experiment number nested within paper ID as a random effect. This complex random effect structure was necessary due to the non-independence of effect sizes from the same experiment and/or paper, since these experiments would typically share many characteristics (e.g., measure, procedure, or stimuli). We attempted to perform confirmatory analysis of our preregistered hypotheses via multi-level meta-regressions including age, language, item properties of the stimuli, and syntax as fixed effects. In some cases (described below), we did not have sufficient data to add particular factors to our analyses.
+All analyses were performed using the `metafor` package in R [@viechtbauer2010]. We pooled effect sizes using a multi-level meta analysis model with effect size nested within experiment number, in turn nested within paper ID as a random effect. This complex random effect structure was necessary due to the non-independence of effect sizes from the same experiment and/or paper, since these experiments would typically share many characteristics (e.g., measure, procedure, or stimuli). We attempted to perform confirmatory analysis of our preregistered hypotheses via multi-level meta-regressions including age, language, item properties of the stimuli, and syntax as fixed effects. In some cases (described below), we did not have sufficient data to add particular factors to our analyses.
 
 # Results
 
-Figure \ref{fig:forest} shows the overall forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting a positive shape bias effect. Nevertheless, effects varied substantially, yielding a substantial amount of within- and between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
+Figure \ref{fig:forest} shows the forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting a positive shape bias effect. Nevertheless, effects varied substantially, yielding a substantial amount of within- and between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
 
 Not all stimuli in our coded studies were expected to produce a shape bias, with `r length(which(df_shape$solidity == 'solid')) ` effect sizes involving solid objects and only `r length(which(df_shape$solidity != 'solid'))` using non-solid objects. Although we did not preregister removing studies with non-solid targets, we believe this is an important step since all theories of the shape bias would predict smaller effects for non-solid targets. In our remaining analysis, we focus on the subset of effects using solid objects, deviating from our preregistration. Heterogeneity for this subset is ($I^2 = `r round(I2_solid, 2)`$). So, the heterogeneity remains high even when generalizing by shape for a set of stimuli with only solid objects, motivating the moderation analyses below. 
 
@@ -440,6 +440,7 @@ ggplot(df_shape_solid,
   theme_minimal() + 
   theme(legend.position = "bottom")
 ```
+
 Due to the high overall heterogeneity, we investigated the influence of the developmental changes in the magnitude of the shape bias by adding age as a factor. Model selection followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic, using the corrected Akaike information criterion AICc. A difference of $\Delta_{AIC} > 4$ between the lowest AICc and any other AICc was interpreted as a meaningful difference. 
 
 All models including age fit better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The linear model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a linear function for our subsequent analysis with a significant overall estimate of `r round(polycoeff$coeff[1], 3)` ($p=$ `r papaja::apa_p(mod_age$pval)[1]`) that decreases with quadratic age `r round(polycoeff$coeff[2], 5)` ($p=$ `r papaja::apa_p(mod_age$pval)[2]`) and a heterogeneity of ($I^2 = `r round(I2_linear, 2)`$).
@@ -514,7 +515,7 @@ eggerscoeff <- tibble(coeff = c(round(coef(eggerstest),2)))
 
 ## Cross-linguistic differences
 
-Based on the previous literature, we hypothesized that language/culture would be  potential moderators influencing the degree of shape-based generalization. Nevertheless, due to limited data availability beyond English, conducting language-specific analyses was not feasible. As a consequence, languages were categorized into two groups: Indo-European (encompassing German and Spanish and English), Non-Indo-European (including Japanese, Mandarin, Vietnamese, Korean, and Tsimane).
+Based on the previous literature, we hypothesized that language and culture would be potential moderators influencing the degree of shape-based generalization. However, due to limited data availability beyond English, conducting language-specific analyses was not feasible. As a consequence, languages were categorized into two groups: Indo-European (encompassing German and Spanish and English), Non-Indo-European (including Japanese, Mandarin, Vietnamese, Korean, and Tsimane).
 
 ```{r include = FALSE, results = 'asis'}
 
