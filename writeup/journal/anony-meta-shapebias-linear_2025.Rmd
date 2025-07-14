@@ -82,6 +82,8 @@ library(here)
 library(broom)
 library(kableExtra)
 library(dmetar)
+library(DiagrammeR)
+
 ```
 
 # Introduction
@@ -165,45 +167,26 @@ Except where noted, all hypotheses, literature search criteria, and statistical 
 
 ## Literature search
 
-We created an initial set of papers to screen for inclusion in the meta-analysis. We based this set on the combined output of google scholar searches using the key words "shape bias", "word generalization", "word learning" combined. We also performed forward citation searches of two foundational papers in this literature: @landau1988 and @imai1997, In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma2} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
+```{r include= FALSE, eval=FALSE}
+prisma(found = 154,
+       found_other = 22,
+       no_dupes = 176, 
+       screened = 176 , 
+       screen_exclusions = 52, 
+       full_text = 124,
+       full_text_exclusions = 31, 
+       qualitative = 93,
+       quantitative = 93)
 
-```{r prisma, eval= FALSE, include= FALSE, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
+```
+We created an initial set of papers to screen for inclusion in the meta-analysis. We based this set on the combined output of google scholar searches using the key words "shape bias", "word generalization", "word learning" combined. We also performed forward citation searches of two foundational papers in this literature: @landau1988 and @imai1997, In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
+```{r prisma, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
 knitr::include_graphics("prisma.png")
 ```
-
 In total, 161 papers were found. We filtered these first via titles and abstracts and then via full-text screening, based on the following eligibility criteria:
 1. Effects must be from an experiment (e.g., with random assignment of participants to at least two conditions), 
 2. The experiment must include participants less than 5 years old,
 3. The experiment must use a word extension task that contrasts shape with other properties of the referent. 
-
-```{r prisma2}
-prisma2 <- PRISMAstatement::prisma(found = 154,
-       found_other = 22,
-       no_dupes = 176, 
-       screened = 176 , 
-       screen_exclusions = 52, 
-       full_text = 124,
-       full_text_exclusions = 31, 
-       qualitative = 93,
-       quantitative = 93)
-prisma2
-```
-
-```{r prisma ,fig.height = 3.5, fig.width= 3, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
-#out.width = "100%"
-#dev='png'
-#from https://cran.r-project.org/web/packages/PRISMAstatement/vignettes/PRISMA.html
-prisma <- PRISMAstatement::prisma(found = 154,
-       found_other = 22,
-       no_dupes = 176, 
-       screened = 176 , 
-       screen_exclusions = 52, 
-       full_text = 124,
-       full_text_exclusions = 31, 
-       qualitative = 93,
-       quantitative = 93)
-
-```
 
 Applying these criteria resulted in `r length(unique(df_shape$ID))` papers that both satisfied our criteria and reported enough information to calculate an effect size (ES) relating to one or more experimental conditions. An ES could be directly reported or could be computed based on reporting of the proportion of choosing shape in text, tables, graphs; or reporting a statistical test (typically a comparison of shape bias against chance using a test such as a one sample $t$-test). 
 
