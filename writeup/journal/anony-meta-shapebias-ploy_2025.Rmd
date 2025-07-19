@@ -88,9 +88,9 @@ library(DiagrammeR)
 
 # Introduction
 
-If a prelinguistic child hears the word "spoon" in the presence of a spoon, how could they know whether the word refers to the whole object, its color, just the bowl but not the rest of the spoon, or this specific spoon but not other spoon-like objects? Despite the large number of logically possible hypotheses about the meaning of each individual word, children learn word meanings quickly [@quine1954]. Additionally, children are few-shot learners, and without explicit instruction or feedback, they are able to generalize the meaning of a word to new members of that semantic category that share some properties with the original referent. For example, if a child hears the word "spoon" in the presence of a spoon, they can generalize this word to other spoons, but not to forks or knives. To resolve this puzzle, researchers have proposed a variety of innate constraints, learned biases, and reasoning processes that could potentially help children identify word meanings, and successfully extend them to category members. One well-studied proposal is the idea that children have a *shape bias*: a tendency to generalize nouns by the referent's shape more than other perceptual attributes like color, texture, or size [@landau1988; @subrahmanyam_2006] or conceptual attributes like a functional, thematic, or a taxonomic match [@imai_childrens_1994; @Poulin-Dubois1999, @imai2010; @yoshida2003known]. 
+If a prelinguistic child hears the word "spoon" in the presence of a spoon, how could they know whether the word refers to the whole object, its color, just the bowl but not the rest of the spoon, or this specific spoon but not other spoon-like objects? Despite the large number of logically possible hypotheses about the meaning of each individual word, children learn word meanings quickly [@quine1954]. Additionally, children are few-shot learners, and without explicit instruction or feedback, they are able to generalize the meaning of a word to new members of that semantic category that share some properties with the original referent. For example, if a child hears the word "spoon" in the presence of a spoon, they can generalize this word to other spoons, but not to forks or knives. To resolve this puzzle, researchers have proposed a variety of innate constraints, learned biases, and reasoning processes that could potentially help children identify word meanings, and successfully extend them to category members. One well-studied proposal is the idea that children have a *shape bias*: a tendency to generalize nouns by the referent's shape more than other perceptual attributes like color, texture, or size [@landau1988; @subrahmanyam_2006] or conceptual attributes like a functional, thematic, or a taxonomic match [@imai_childrens_1994; @Poulin-Dubois1999; @imai2010; @yoshida2003known]. 
 
-One reason for researchers' long-standing interest in the shape bias relates to its hypothesized role in early word learning. In one study, @smith_object_2002 trained 17-month-old children over 7 weeks by repeatedly playing with and hearing names of unfamiliar objects from categories that were well organized by shape. Children who received the training showed evidence of generalizing new categories by shape compared with children who hadn't received the training, suggesting that practice with shape categories had helped them acquire a broader, more general shape bias. Further, the trained group learned more object names -- as measured by parent reports -- during and after the intervention, suggesting that the shape bias could be an important tool for noun learning for children in this age group. Additionally, it has been found to be weaker in children with language impairments, and in children with autism spectrum disorder [@JONES_SMITH_2005; @Jones2003LateTS; @Collisson2015IndividualDI; @perry2019heterogeneity; @potrzeba2015_ASD; @tek2008children; @perry2021vocabulary]. Although the causality direction is not yet clear, but this suggests that the shape bias may be a useful tool for children learning nouns, and that it may be a useful predictor of language development. 
+One reason for researchers' long-standing interest in the shape bias relates to its hypothesized role in early word learning. In one study, @smith_object_2002 trained 17-month-old children over 7 weeks by repeatedly playing with and hearing names of unfamiliar objects from categories that were well organized by shape. Children who received the training showed evidence of generalizing new categories by shape compared with children who hadn't received the training, suggesting that practice with shape categories had helped them acquire a broader, more general shape bias. Further, the trained group learned more object names -- as measured by parent reports -- during and after the intervention, suggesting that the shape bias could be an important tool for noun learning for children in this age group [see [@Perry2010_Variability] for further discussion]. Additionally, it has been found to be weaker in children with language impairments, and in children with autism spectrum disorder [@JONES_SMITH_2005; @Jones2003LateTS; @Collisson2015IndividualDI; @perry2019heterogeneity; @potrzeba2015_ASD; @tek2008children; @perry2021vocabulary]. Although the causality direction is not yet clear, but this suggests that the shape bias may be a useful tool for children learning nouns, and that it may be a useful predictor of language development. 
 
 The shape bias is typically demonstrated in different varieties of word extension tasks. In their basic setup, these tasks typically involve giving a novel label to a single exemplar object, which is then contrasted with test objects that vary in shape, color, texture, or other properties. For instance, in one study 15-month-old children were shown an exemplar object that had a specific non-visual property like producing a sound when tapped. Then children were asked which of the test objects – which matched the exemplar in either color, shape, or material – belonged to the same category. Children selectively extended the non-visual property to the test objects that resembled the exemplar in shape, revealing a bias towards this dimension [@graham_2010; @specific_bloom; @samuelson_dynamic_2007]. 
 
@@ -104,9 +104,11 @@ Where does the shape bias come from? We consider four different explanations of 
 
 One explanation for the shape bias could be that children have an innate tendency to generalize by shape. This proposal was called into question, however, by the observation that the shape bias is primarily found in linguistic generalization tasks as opposed to non-linguistic similarity judgment tasks, indicating that it is unlikely to be a generalized attentional bias [@landau1988; @smith_object_2002; @poulin1999role; @smith1992Adjective; @samuelson2000children; @imai_childrens_1994; @dumb_mechanism1996] [see @specific_bloom for counter argument]. Further, the magnitude of the shape bias appears to vary across ages, language onset, cultures, and languages, inconsistent with a purely nativist explanation.
 
-An alternative proposal argues that children acquire the shape bias by generalizing the lexical statistics of their language. The early vocabulary of English-speaking children in the US is predominantly comprised of nouns referring to solid objects, suggesting that the shape bias may be an "over-hypothesis" that nouns tend to generalize in the same way as one another [@gershkoff2004shape; @samuelson_statistical_2002; @samuelson1999; @perry2010learn; @colunga2000learning; @yoshida2003known; @perry2011; @dumb_mechanism2004; @perry2021vocabulary]. Children's early experience with nouns referring to solid and countable objects, in turn, privileges the property of shape, leading to an inductive bias, such that as children learn more nouns, they should be more likely to pick up on shape as an organizing regularity of the lexicon. This proposal is supported by the observation that children and computer simulations with larger vocabularies show a stronger shape bias [@samuelson_statistical_2002; @samuelson1999; @perry2011shape] [see [@spanish_CANTRELL_2012; @colunga2017not; @tek2008children; @perry2021vocabulary; @graham1999infants; @booth2005conceptual] for further discussion and counter arguments]. However, this proposal alone, does not explain why children learning different languages (e.g., East Asian languages) show a weaker shape bias. 
+An alternative proposal argues that children acquire the shape bias by generalizing the lexical statistics of their language. The early vocabulary of English-speaking children in the US is predominantly comprised of nouns referring to solid objects, suggesting that the shape bias may be an "over-hypothesis" that nouns tend to generalize in the same way as one another [@gershkoff2004shape; @samuelson_statistical_2002; @samuelson1999; @perry2010learn; @colunga2000learning; @yoshida2003known; @perry2011; @dumb_mechanism2004; @perry2021vocabulary]. Children's early experience with nouns referring to solid and countable objects, in turn, privileges the property of shape, leading to an inductive bias, such that as children learn more nouns, they should be more likely to pick up on shape as an organizing regularity of the lexicon. This proposal is supported by the observation that both children and computer simulations trained with larger US English vocabulary show a stronger shape bias [@samuelson_statistical_2002; @samuelson1999; @perry2011shape] [see [@spanish_CANTRELL_2012; @colunga2017not; @tek2008children; @perry2021vocabulary; @graham1999infants; @booth2005conceptual; @animate_graham1999] for further discussion and counter arguments]. However, this proposal alone, lacks a quantifiable robust evidence for why children learning different languages (e.g., East Asian languages) show a weaker shape bias, and how their capacity to learn nouns develop. 
 
-Additionally, this generalization may be guided by the syntax of children's native language. In English, count nouns (e.g., "ball") are generalized by shape while mass nouns (e.g., "sand") that cannot be modified by numerals or combined with indefinite articles ("a" or "an") are not. The presence of this distinction might facilitate English-speaking children (and other children learning languages with a mass-count distinction) in picking out the category of words to which the shape bias can be productively applied. In contrast, children learning languages that lack the mass-count distinction (e.g., some East Asian languages like Mandarin or Japanese) do not have access to this organizing principle, making the statistics of their lexicon less clear cut. Some experiments have also explicitly varied whether count/mass language is used in the presentation of new objects, directly testing whether this syntactic cue guides generalization [@samuelson2008rigid; @soja1991ontological; @soja_perception_1992; @tran2012honoring]. 
+Additionally, this generalization may be guided by the syntax of children's native language. In English, count nouns (e.g., "ball") are generalized by shape while mass nouns (e.g., "sand") that cannot be modified by numerals or combined with indefinite articles ("a" or "an") are not. The presence of this distinction might facilitate English-speaking children (and other children learning languages with a mass-count distinction) in picking out the category of words to which the shape bias can be productively applied. In contrast, children learning languages that lack the mass-count distinction (e.g., some East Asian languages like Mandarin or Japanese) do not have access to this organizing principle. Some experiments have explicitly varied whether count/mass language is used in the presentation of new objects, directly testing whether this syntactic cue guides generalization [@samuelson2008rigid; @soja1991ontological; @soja_perception_1992; @tran2012honoring]. Theoretically, this syntactic facilitation could take three routes; it might build the structure of thought that underlies perceiving and categorizing objects from scratch. Secondly, it might provide cues that lead to carving out the existing objects space and restructuring it. Thirdly, it might provide cues that develop sensitives that respect the statistical regularities of both the linguistic and perceptual space without modifying it, making the statistics of the lexicon less clear cut for classifier language speakers. Here, we don't attempt to disentangle these three routes, but rather to quantify the degree to which the shape bias is moderated by the presence of mass/count syntax in the language used in the experiment. 
+
+Finally, a third proposal is that children learn the shape bias from their environment, and that this learning is not necessarily mediated by language. For example, children might learn to generalize by shape because they are exposed to many objects that are similar in shape but vary in other properties such as color or texture. This exposure could be more prevalent in industrialized cultures where children are surrounded by manufactured artifacts (e.g., toys, furniture) that are often similar in shape but vary in other dimensions. In contrast, children in less industrialized cultures might be exposed to more natural objects (e.g., plants, animals) that vary more in shape and less in other dimensions. Thus, the statistical regularities of the environment could lead to a stronger shape bias in children from industrialized cultures compared with those from less industrialized cultures [@samuelson_statistical_2002; @perry2011shape; @perry2010learn; @colunga2000learning; @colunga2017not].
 
 A final proposal is that shape bias might in part be a function of exposure to manufactured artifacts, since children often see many examples of an artifact that vary in color, size, or texture but are similar in shape (e.g., balls or toy cars). Exposure to such artifacts is higher in industrialized cultures where a built environment is more prevalent. While nearly all hammers are hammer-shaped, many plants are similar to one another in overall shape but vary in other details such as color, texture, or sub-part shape. Children in more industrialized cultures might see relatively more hammer-like categories and relatively fewer plant-like categories compared with children in less-industrialized contexts. Supporting this hypothesis, Tsimane' speakers in Bolivia, who have relatively less artifact experience, showed a lower level of shape bias compared with English speakers from an industrialized culture [@jara2022]. Once again, how much similarity or distinction exists between the statistical regularities in the lexicon and the statistical regularities in the environment is not clear. As well as how to explain the cross-cultural and -linguistic differences, and whether this difference in the observed effect is a graded difference or a crisp one. 
 
@@ -114,11 +116,11 @@ A final proposal is that shape bias might in part be a function of exposure to m
 
 Across the large literature investigating children's shape-based generalizations, the magnitude of the observed shape bias varies widely. We next review some of these sources of variation, which guide the research questions that we assess using our meta-analysis. Some -- but not all -- sources of variation relate to the theoretical proposals about the origins of the shape bias. These links between observed variation and theory are not always clear and have rarely been stated in quantitative form. In the Discussion, we revisit the question of how to link our meta-analysis to the theoretical accounts described above.
 
-First, the shape bias varies developmentally, However, the trajectory of the change is not robuslty mapped. For example, it appears to increase at or before the second birthday, continues to increase at the 3rd year until adulthood in some studies [@samuelson2008rigid; @landau1988;@jara2022;] and perhaps decreases in some others. For example, in one study, 3-year-olds showed a strong bias to generalize nouns by shape, while 5-year-olds and adults showed a weaker bias [@landau1998object; @subrahmanyam_2006;@imai_childrens_1994]. Age differences were also a function of the specifics of the task, condition, and items used [@imai1997; @graham1999function; @dumb_mechanism1996; @booth2005conceptual;@Subrahmanyam1999_age_complex]. In our meta-analysis, we attempt to quantify developmental change in the magnitude of the bias (Research Question 1).
+First, the shape bias varies developmentally, However, the trajectory of the change is not robuslty mapped. For example, it appears to increase at or before the second birthday, continues to increase at the 3rd year until adulthood in some studies [@samuelson2008rigid; @landau1988; @jara2022] and perhaps decreases in some others. For example, in one study, 3-year-olds showed a strong bias to generalize nouns by shape, while 5-year-olds and adults showed a weaker bias [@landau1998object; @subrahmanyam_2006;@imai_childrens_1994]. Age differences were also a function of the specifics of the task, condition, and items used [@imai1997; @graham1999function; @dumb_mechanism1996; @booth2005conceptual;@Subrahmanyam1999_age_complex]. In our meta-analysis, we attempt to quantify developmental change in the magnitude of the bias (Research Question 1).
 
 Second, studies on the shape bias have been conducted across a variety of languages and cultures that vary in their mass/count syntax, other linguistic properties, and many cultural dimensions including environment and industrialization. Speakers of Eastern Asian languages such as Japanese and Mandarin have been claimed to show a reduced tendency to rely on shape for word extension [@gathercole_1997; @imai1997; @jara2022; @samuelson1999; @soja1991ontological; @subrahmanyam_2006; @yoshida2003; @imai2010; @tran2012honoring; @CANTRELL2013258]. The intersection of cross-linguistic and developmental variation adds another layer of complexity. In one study, English- and Mandarin-speaking 3-year-olds generalized by shape. In contrast, Mandarin-speaking 4-year-olds and adults generalized by material while English-speaking 4-year-olds and adults showed a preference for shape [@subrahmanyam_2006]. As is common in cross cultural/cross-linguistic research, observed variation across populations can be difficult to interpret due to the myriad correlated cultural and linguistic factors that differ between populations. We attempt to quantify evidence of cross-cultural differences across ages (Research Question 2).
 
-Third, studies vary significantly in their procedures, stimuli, and comparison dimensions. For example, two-year-olds were found to generalize by shape in the case of artifacts, while relying on both shape and texture in the case of animate objects [@booth2005conceptual; @yoshida2003]. On the other hand, when given information about objects' function, preschool children reportedly used shape to generalize the noun label, while older children were more likely to use function [@graham1999; @gentner_1978; @smith_naming_1996; @landau1998object]. Likewise, shape bias was found to be more prevalent with three dimensional objects than two dimensional ones [@davidson2018effects], and dissipated altogether when children were no longer forced to choose between test objects [@cimpian2005absence].
+Third, studies vary significantly in their procedures, stimuli, and comparison dimensions. For example, two-year-olds were found to generalize by shape in the case of artifacts, while relying on both shape and texture in the case of animate objects [@booth2005conceptual; @yoshida2003] (see @animate_graham1999 for counter argument). On the other hand, when given information about objects' function, preschool children reportedly used shape to generalize the noun label, while older children were more likely to use function [@graham1999; @gentner_1978; @smith_naming_1996; @landau1998object]. Likewise, shape bias was found to be more prevalent with three dimensional objects than two dimensional ones [@davidson2018effects], and dissipated altogether when children were no longer forced to choose between test objects [@cimpian2005absence].
 
 The shape bias is thought to be a distinctive extension strategy for solid objects, but it is also reported to be mediated by the perceptual boundary between complex and simple objects. For example, English and Japanese-speaking children are found to prioritize shape for complex industrial artifacts with clear functions. Only Japanese children, however, were claimed to show reduced shape generalization for simple uniform objects with no clear function [@imai1997; @gentner_1978; @srinivasan2019_polysemy; @Sandhofer2004_complex; @cook2006_bilingual_complex]. While in other studies the complexity of objects elicited a lower effect, and perhaps was unrelated [@cimpian2005absence; @potrzeba2015_ASD]. Two main points must be noted here, the first is that the notion of object complexity doesn't have a clear and explicitly shared definition. The second is that functionality and complexity are used interchangeably in the literature. For example, in one study, the authors used the term "complex" to refer to industrial objects with a clear function, while in other studies, the same term was used to refer to objects' number of parts, corners, boundaries, curvature, and richness of details, regardless of its industrial and functional status [@imai1997; @gentner_1978; @SON2008_complex; @Subrahmanyam1999_age_complex]. Thus, we also attempt to evaluate the relationship between complexity of objects and the propensity to generalize by shape (Research Question 3).
 
@@ -168,22 +170,22 @@ Except where noted, all hypotheses, literature search criteria, and statistical 
 ## Literature search
 
 ```{r include= FALSE, eval=FALSE}
-prisma(found = 154,
+prisma(found = 156,
        found_other = 22,
-       no_dupes = 176, 
-       screened = 176 , 
-       screen_exclusions = 52, 
-       full_text = 124,
-       full_text_exclusions = 31, 
-       qualitative = 93,
-       quantitative = 93)
+       no_dupes = 170, 
+       screened = 170 , 
+       screen_exclusions = 51, 
+       full_text = 119,
+       full_text_exclusions = 48,  # 39 + 9 papers not coded 
+       qualitative = 71,
+       quantitative = 71)
 
 ```
 We created an initial set of papers to screen for inclusion in the meta-analysis. We based this set on the combined output of google scholar searches using the key words "shape bias", "word generalization", "word learning" combined. We also performed forward citation searches of two foundational papers in this literature: @landau1988 and @imai1997, In addition to previously identified studies through domain knowledge and reference lists. Figure \ref{fig:prisma} shows a PRISMA diagram describing our screening process. We only included published papers, excluding unpublished theses and dissertations.
 ```{r prisma, fig.height = 3, fig.width =4, echo=FALSE, fig.cap="PRISMA diagram showing the results of our literature screening process.", fig.align = "center", fig.pos = "H"}
 knitr::include_graphics("prisma.png")
 ```
-In total, 161 papers were found. We filtered these first via titles and abstracts and then via full-text screening, based on the following eligibility criteria:
+In total, 170 papers were found. We filtered these first via titles and abstracts and then via full-text screening, based on the following eligibility criteria:
 1. Effects must be from an experiment (e.g., with random assignment of participants to at least two conditions), 
 2. The experiment must include participants less than 5 years old,
 3. The experiment must use a word extension task that contrasts shape with other properties of the referent. 
@@ -233,6 +235,16 @@ I2 <- sum(mod$sigma2) / (sum(mod$sigma2) + (mod$k-mod$p)/sum(diag(P)))
 
 
 # using dmetar package for calculating I2 is only for three level modeling, mine is four level
+```
+
+```{r include=FALSE}
+n_bilingual <- sum(df_shape$monolingual == "bilingual", na.rm=TRUE)
+n_atypical <- sum(df_shape$child_type1 == "ASD", na.rm=TRUE)
+
+df_shape <- filter(df_shape, 
+                   monolingual == "monolingual", 
+                   child_type1 == "TD", 
+                   d<5)
 ```
 
 ```{r include=FALSE}
@@ -294,28 +306,14 @@ X_solid <- model.matrix(mod_intercept )
 P_solid <- W_solid - W_solid %*% X_solid %*% solve(t(X_solid) %*% W_solid %*% X_solid) %*% t(X_solid) %*% W_solid
 I2_solid <- sum(mod_intercept $sigma2) / (sum(mod_intercept $sigma2) + (mod_intercept $k-mod_intercept $p)/sum(diag(P_solid)))
 
-W_linear <- diag(1/mod_age $vi)
-X_linear<- model.matrix(mod_age )
-P_linear <- W_linear - W_linear %*% X_linear %*% solve(t(X_linear) %*% W_linear %*% X_linear) %*% t(X_linear) %*% W_linear
-I2_linear <- sum(mod_age $sigma2) / (sum(mod_age $sigma2) + (mod_age $k-mod_age $p)/sum(diag(P_linear)))
+W_poly <- diag(1/mod_poly $vi)
+X_poly <- model.matrix(mod_poly )
+P_poly <- W_poly - W_poly %*% X_poly %*% solve(t(X_poly) %*% W_poly %*% X_poly) %*% t(X_poly) %*% W_poly
+I2_poly <- sum(mod_poly $sigma2) / (sum(mod_poly $sigma2) + (mod_poly $k-mod_poly $p)/sum(diag(P_poly)))
 
 ```
 
-```{r}
-
-# W_solid <- diag(1/mod_poly_3lvl $vi)
-# X_solid <- model.matrix(mod_poly_3lvl )
-# P_solid <- W_solid - W_solid %*% X_solid %*% solve(t(X_solid) %*% W_solid %*% X_solid) %*% t(X_solid) %*% W_solid
-# I2_solid <- sum(mod_poly_3lvl $sigma2) / (sum(mod_poly_3lvl $sigma2) + (mod_poly_3lvl $k-mod_poly_3lvl $p)/sum(diag(P_solid)))
-# 
-# W_solid <- diag(1/mod_poly_3lvl_v $vi)
-# X_solid <- model.matrix(mod_poly_3lvl_v )
-# P_solid <- W_solid - W_solid %*% X_solid %*% solve(t(X_solid) %*% W_solid %*% X_solid) %*% t(X_solid) %*% W_solid
-# I2_solid <- sum(mod_poly_3lvl_v $sigma2) / (sum(mod_poly_3lvl_v $sigma2) + (mod_poly_3lvl_v $k-mod_poly_3lvl_v $p)/sum(diag(P_solid)))
-
-```
-
-```{r forest, fig.height = 4, fig.width= 3 , echo=FALSE, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Solid line is zero effect size, dashed line is the overall meta-analytic effect size. Color indicates language family.", fig.pos = "H", fig.align='center'}
+```{r forest, fig.height = 5, fig.width= 3 , echo=FALSE, fig.cap="Forest plot of all coded effect sizes, sorted by average effect size. Multiple points for an individual paper indicate multiple effects. Solid line is zero effect size, dashed line is the overall meta-analytic effect size. Color indicates language family.", fig.pos = "H", fig.align='center'}
 
 #, out.width="100%"
 
@@ -354,17 +352,8 @@ Because many of the papers we coded were decades old, reporting standards varied
 
 For each effect size, we attempted to code the following moderators: participant age; number of participants; type of syntax used -- informative (count/mass) or neutral^[We additionally coded whether common or proper noun syntax was used and (if applicable) whether animate or inanimate syntax was used, but both of these were sparsely used and we do not discuss them further.]; alternative test objects properties (e.g., shape, color, material); nature of the stimuli: solidity, animacy, and whether they were two- or three-dimensional; type of exposure before testing (whether the child saw multiple training examples of the target object, or just a single example); child's vocabulary size; country of test and language spoken by participants; response mode (grasping, pointing, or verbalizing); measured behavior (e.g., behavioral, eye tracking); population type (typically developing or not); total number of trials. (Effect sizes are estimated across different groups of contrasting properties: shape vs color, material, function etc.).
 
-```{r include=FALSE}
-n_bilingual <- sum(df_shape$monolingual == "bilingual", na.rm=TRUE)
-n_atypical <- sum(df_shape$child_type1 == "ASD", na.rm=TRUE)
-
-df_shape <- filter(df_shape, 
-                   monolingual == "monolingual", 
-                   child_type1 == "TD")
-```
-
 For our preregistered analyses, we excluded effect sizes from clinical populations (N=`r n_atypical`) and multilingual populations (N=`r n_bilingual`), though these effect sizes remain in the data file we provide.
-Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while Japanese included only `r sum(df_shape$language == "japanese")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
+Representation across languages varied substantially, such that there were `r sum(df_shape$language == "english")` effect sizes for English while other languages included only `r sum(df_shape$language != "english")` data points. Other languages included German, Spanish, Chinese, Japanese, Korean, Vietnamese, and Tsimane. 
 The final coded sample consisted of `r length(unique(df_shape$ID))` papers with `r nrow(df_shape)` effect sizes. 
 
 ## Analytic approach
@@ -373,14 +362,14 @@ All analyses were performed using the `metafor` package in R [@viechtbauer2010].
 
 # Results
 
-Figure \ref{fig:forest} shows the forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`), suggesting a positive shape bias effect. Nevertheless, effects varied substantially, yielding a substantial amount of within- and between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
+Figure \ref{fig:forest} shows the forest plot for coded effect sizes. Our initial meta-analytic model with no moderators revealed an overall effect size of `r round(coef(mod), 2)` [`r round(mod$ci.lb, 2)`, `r round(mod$ci.ub,2)`] ($p$ `r papaja::apa_p(mod$pval)`). Nevertheless, effects varied substantially, yielding a substantial amount of within- and between-study heterogeneity ($I^2 = `r round(I2, 2)`$). 
 
 Not all stimuli in our coded studies were expected to produce a shape bias, with `r length(which(df_shape$solidity == 'solid')) ` effect sizes involving solid objects and only `r length(which(df_shape$solidity != 'solid'))` using non-solid objects. Although we did not preregister removing studies with non-solid targets, we believe this is an important step since all theories of the shape bias would predict smaller effects for non-solid targets. In our remaining analysis, we focus on the subset of effects using solid objects, deviating from our preregistration. Heterogeneity for this subset is ($I^2 = `r round(I2_solid, 2)`$). So, the heterogeneity remains high even when generalizing by shape for a set of stimuli with only solid objects, motivating the moderation analyses below. 
 
 ## Developmental change
 ```{r include=FALSE}
 
-mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean, 
+mod_ployage_ie <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                          V = d_var,
                          random = ~ 1 | ID/exp_num/index, 
                          slab = short_cite, 
@@ -426,7 +415,7 @@ ggplot(df_shape_solid,
 
 Due to the high overall heterogeneity, we investigated the influence of the developmental changes in the magnitude of the shape bias by adding age as a factor. Model selection followed our preregistered strategy of comparing four types of functional forms in our multi-level model: constant, linear, logarithmic, and quadratic, using the corrected Akaike information criterion AICc. A difference of $\Delta_{AIC} > 4$ between the lowest AICc and any other AICc was interpreted as a meaningful difference. 
 
-All models including age fit better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The linear model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a linear function for our subsequent analysis with a significant overall estimate of `r round(polycoeff$coeff[1], 3)` ($p=$ `r papaja::apa_p(mod_age$pval)[1]`) that decreases with quadratic age `r round(polycoeff$coeff[2], 5)` ($p=$ `r papaja::apa_p(mod_age$pval)[2]`) and a heterogeneity of ($I^2 = `r round(I2_linear, 2)`$).
+All models including age fit better than the model without age ($\Delta_{AIC}$ between `r round(AICs$delta_aic[AICs$model == "logage"], 2)` and `r round(AICs$delta_aic[AICs$model == "polyage"], 2)`). The polynomial model fit best ($\Delta_{AIC} =$ `r round(AICs$delta_aic[AICs$model == "polyage"] - AICs$delta_aic[AICs$model == "age"], 2)`), so we adopted a polynomial function for our subsequent analysis with a significant overall estimate of `r round(polycoeff$coeff[1], 3)` ($p=$ `r papaja::apa_p(mod_poly$pval)[1]`), an age coefficient of `r round(polycoeff$coeff[2], 5)` ($p=$ `r papaja::apa_p(mod_poly$pval)[2]`) and a heterogeneity of ($I^2 = `r round(I2_poly, 2)`$).
 
 ``` {r eggers test copied from its source code, eval = FALSE}
 eggers.test = function(x) {
@@ -504,7 +493,7 @@ Based on the previous literature, we hypothesized that language and culture woul
 
 #contrasts(df_shape$indoeuropean) <- contr.sum
 
-lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean, 
+lang_model <- rma.mv(d ~ mean_age_months_centered36 * indoeuropean + I(mean_age_months_centered36^2) * indoeuropean, 
                      V = d_var,
                      random = ~ 1 | ID/exp_num/index, 
                      slab = short_cite, 
@@ -517,8 +506,8 @@ lang_model_all <- rma.mv(d ~ mean_age_months_centered36 * language + I(mean_age_
                      slab = short_cite, 
                      data = df_shape_solid)
 
-mdlcoeff <- tibble(coeff = c(round(coef(lang_model),2)))
-
+mdlcoeff <- tibble(coeff = c(coef(lang_model)))
+#mdlcoeff <- tibble(coeff = c(round(coef(lang_model),2)))
 #mdlcoeff$coeff[1]
 
 
@@ -550,19 +539,19 @@ summary(lang_model)
 \hline
   & \bf{$\beta$} & \bf{SE} & \bf{$z$} & \bf{$p$} & \bf{lower CI} & \bf{upper CI}\\
 \hline
-Intercept & 1.0354 & 0.1163	 & 8.8996 & <.0001 & 0.8074	& 1.2634\\
-Age & 0.0162 & 0.006 & 2.7129 & 0.0067 & 0.0045 & 0.0279\\
-Non-Indo-European & -0.3514 & 0.2045 & -1.7179 & 0.0858 & -0.7523 & 0.0495\\
-$\text{Age}^2$ & -0.0012 & 0.0003 & -3.6697 & 0.0002 & -0.0018 & -0.0005\\
-Age $\times$ Non-IE & -0.0285 & 0.0192 & -1.4839 & 0.1378 & -0.0660 & 0.0091\\
-Non-IE $\times \text{Age}^2$ & 0.0010 & 0.0007 & 1.4347 & 0.1514 & -0.0004 & 0.0024\\
+Intercept & 0.7457 & 0.1184	 & 6.2985 & <.0001 & 0.5136	& 0.9777\\
+Age & 0.0125 & 0.0060 & 2.0723 & 0.0382 & 0.0007 & 0.0243\\
+Non-Indo-European & -0.1582 & 0.1733 & -0.9127 & 0.3614 & -0.4980 & 0.1815\\
+$\text{Age}^2$ & -0.0007 & 0.0003 & -2.3854 & 0.0171 & -0.0012 & -0.0001\\
+Age $\times$ Non-IE & -0.0213 & 0.0170 & -1.2532 & 0.2101 & -0.0547 & 0.0120\\
+Non-IE $\times \text{Age}^2$ & 0.0005 & 0.0007 & 0.7655 & 0.4440 & -0.0008 & 0.0018\\
 \hline
 \end{tabular}
 }
-\caption{\label{langmodel} Results of the meta-regression model incoroprating both language and age (in months). Non-IE = "Non-Indo-European."}
+\caption{\label{langmodel} Results of the meta-regression model incorprating both language and age (in months). Non-IE = "Non-Indo-European."}
 \end{table}
 
-A model incorporating language group and age as moderators revealed a significant coefficient of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European populations at the age of 36 months, with a significantly smaller predicted effect for the non-Indo-European group `r round(mdlcoeff$coeff[3], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[3]`). The effect showed a gradual but significant decline with quadratic age `r mdlcoeff$coeff[4]` ($p=$ `r papaja::apa_p(lang_model$pval)[4]`) and the between-study heterogeneity remained high in this moderated model ($I^2 = `r round(I2_lang, 2)`$). All coefficients are shown in Table \ref{langmodel}, and Figure \ref{fig:dev-change} shows model fit compared with individual effect size estimates. 
+A model incorporating language group and age as moderators revealed a significant coefficient of `r round(mdlcoeff$coeff[1], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[1]`) for Indo-European populations at the age of 36 months, with a smaller predicted effect for the non-Indo-European group `r round(mdlcoeff$coeff[3], 2)` ($p=$ `r papaja::apa_p(lang_model$pval)[3]`). The effect showed a gradual but significant decline with quadratic age `r round(mdlcoeff$coeff[4], 6)` ($p=$ `r papaja::apa_p(lang_model$pval)[4]`) and the between-study heterogeneity remained high in this moderated model ($I^2 = `r round(I2_lang, 2)`$), with most of the variance at the between-paper level ($sigma^2 = `r round(lang_model$sigma2[1])`). All coefficients are shown in Table \ref{langmodel}, and Figure \ref{fig:dev-change} shows model fit compared with individual effect size estimates. 
 
 ``` {r  include = FALSE}
 tidy_lang_model <- tidy(lang_model)
@@ -582,12 +571,13 @@ df_shape_indo <- df_shape_solid %>%
 
 df_shape_nonendo <- df_shape_solid %>% 
   filter(indoeuropean == FALSE)
+
 ```
 
 ## Shape and complexity effects
 
 <!-- * RQ3: The strongest shape bias effect will be observed with simple uniform solid objects.  -->
-We also hypothesized that the complexity of solid objects might moderate shape bias. However, only three papers (`r length(which(df_shape$complexity == 'complex')) ` effect sizes) in our sample reported complexity as a dimension of interest. Thus, assessing the impact of object complexity was impractical due to sparse data, variations in stimulus types across studies, along with unclear criteria for categorizing objects as complex or simple, posing challenges for a comprehensive analysis. 
+We also hypothesized that the complexity of solid objects might moderate shape bias. However, only four papers with (`r length(which(df_shape$complexity == 'complex'))` mentions of complex and `r length(which(df_shape$complexity == 'simple'))` simple objects) in our sample reported complexity as a dimension of interest. Thus, assessing the impact of object complexity was impractical due to sparse data, variations in stimulus types across studies, along with unclear criteria for categorizing objects as complex or simple, posing challenges for a comprehensive analysis. 
 
 ## Syntactic effects
 
@@ -595,12 +585,11 @@ We also hypothesized that the complexity of solid objects might moderate shape b
 
 ``` {r include = FALSE}
 # polynomial
-syntax_model <- rma.mv(d ~ mean_age_months_centered36 * Informative_syntax, 
+syntax_model <- rma.mv(d ~ mean_age_months_centered36 * Informative_syntax  + I(mean_age_months_centered36^2) * Informative_syntax, 
        V = d_var, 
        random = ~ 1 | ID/exp_num/index,
        slab = short_cite, 
        data = df_shape_solid)
-
 
 mdlsyntaxcoeff <- tibble(coeff = c(round(coef(syntax_model),2)))
 
@@ -623,9 +612,7 @@ One potential source of bias in meta-analysis comes from publication bias, the t
 # Discussion
 We were interested in taking stock of evidence for the shape bias, as well as quantifying its variation across cultures, ages, and experimental conditions.  Synthesizing effect sizes across studies provided evidence of a shape bias across nearly all ages and languages studied, with a marginally significant evidence for a cross-cultural difference, and huge between-study heterogeneity. The preponderance of large effect sizes from small studies in our data suggests there may be a bias to publish effects favoring the existence of a shape bias, but drawing definitive conclusions about this kind of publication bias is challenging.
 
- <---> EDIT
-Although we are hesitant to over-interpret developmental trends given the heterogeneity we observed, we offer support for one explanation here. The quadratic developmental curve of shape bias is consistent with the notion that shape bias is a statistical over-generalization built on the associations children draw between the type of objects encountered in their early life and how those objects are labeled. Therefore, younger children may not have enough data to form strong associations between noun labels and object properties, while the oldest group might have experienced some sort of a hypothesis shift after gaining more knowledge and experience with noun labels and associated object properties, hence producing this curvilinear trajectory [@samuelson2008rigid]. 
-<---> EDIT
+Although we are hesitant to over-interpret developmental trends given the heterogeneity we observed, we offer support for one explanation here. The quadratic developmental curve of shape bias is consistent with the notion that shape bias is a statistical over-generalization built on the associations children draw between the type of objects encountered in their early life and how those objects are labeled. Therefore, younger children may not have enough data to form strong associations between noun labels and object properties, while the oldest group might have experienced some sort of a hypothesis shift after gaining more knowledge and experience with noun labels and associated object properties, hence producing this curvi-linear trajectory [@samuelson2008rigid]. 
 
 Statistical generalization theories of shape bias have two proposed (not mutually exclusive) sources of this generalization: lexical statistics and environmental regularities. Lexical statistics studies tend to focus on early English vocabulary, while the primary investigation of environmental regularities compared US and Tsimane groups in Bolivia. Direct examination of these statistical regularities hypotheses in the current meta-analysis was impeded, however, by limited data availability on the lexical statistics, early vocabulary composition, and the distribution of shape-based objects in other communities and languages. The interchangeable nature of language and location variables in our dataset (e.g., English predominantly corresponds to the US, and Japanese to Japan), as well as the potential role of syntax in forming associations, making it challenging to differentiate the influence of these various factors [@gershkoff-stowe_shape_2004;@samuelson1999;@jara2022; @imai1997; @barner_language_2009].
 
@@ -639,6 +626,20 @@ PublicationBias::significance_funnel(yi = df_shape_solid$d,
                                      vi = df_shape_solid$d_var,
                                      est_all = coef(mod_age)[1]) +
   theme(legend.position = "bottom")
+
+# df_shape_solid_english <- df_shape_solid %>%
+#   filter(language != "english")
+# 
+# PublicationBias::significance_funnel(yi = df_shape_solid_english $d,
+#                                      vi = df_shape_solid_english$d_var,
+#                                      est_all = coef(mod_age)[1]) +
+#   theme(legend.position = "bottom")
+
+# PublicationBias::significance_funnel(yi = df_shape_solid$d,
+#                                      vi = df_shape_solid$d_var,
+#                                      est_all = coef(mod_age)[1]) +
+#   geom_point(aes(shape = factor(df_shape_solid$language)), size = 2) + # Add points with shape mapped to language
+#   theme(legend.position = "bottom")
 
 ```
 Broadness of the theory on what a specific response implies about the underlying knowledge and mechanisms is a double-edged sword. On the one hand, it allows for a wide range of experimental manipulations to be tested, providing a robust evidence of the phenomenon that is replicable across studies. But on the other hand, it makes it difficult to draw clear conclusions about the nature of the shape bias itself and broadly basis of label catgerization and word extension. The current meta-analysis sheds light on the sparsity of the moderation space, as we found that many studies used different types of stimuli, tasks, and measures, making it challenging, even with a meta-analysis, to recognize the potentially relevant factors, and their interactions over different contexts within the same population, let alone across different populations, and arrive at a commensurable and integrative body of evidence about what a word could mean to a young child [@Almaatouq_Griffiths_Suchow_Whiting_Evans_Watts_2024]. In sum, we believe this work highlights the need for a different framework to examine the shape bias and word learning that utilizes reliable and valid measures, as well as unified procedures to facilitate clearer interpretations and theoretical comparisons.
