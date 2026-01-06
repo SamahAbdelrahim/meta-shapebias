@@ -3,34 +3,33 @@ title             : "Examining the robustness and generalizability of the shape 
 shorttitle        : "Meta-analysis of the shape bias"
 
 author: 
-  - name          : "First Author"
+  - name          : "Samah Abdelrahim"
     affiliation   : "1"
     corresponding : yes    # Define only one corresponding author
-    address       : "Postal address"
-    email         : "my@email.com"
+    address       : "2130, Building 420, 450 Jane Stanford Way, Stanford, CA 94305, USA"
+    email         : "samahabd@stanford.edu"
     role: # Contributorship roles (e.g., CRediT, https://credit.niso.org/)
       - "Conceptualization"
       - "Writing - Original Draft Preparation"
       - "Writing - Review & Editing"
-  - name          : "Second Author"
-    affiliation   : "1,2"
+  - name          : "Michael C. Frank"
+    affiliation   : "1"
     role:
       - "Writing - Review & Editing"
       - "Supervision"
 
 affiliation:
   - id            : "1"
-    institution   : "Some-University"
-  - id            : "2"
-    institution   : "Some-School"
+    institution   : "Stanford University"
 
 authornote: |
-  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
 
-  Enter author note here.
+  Samah Abdelrahim - Department of Psychology, Stanford University. ORCID: https://orcid.org/0009-0009-2651-2884
+  
+  Michael C. Frank - Department of Psychology, Stanford University.
   
 abstract: |
-  The "shape bias"—the tendency to generalize new nouns by their shape rather than features like color or texture—is considered a cornerstone of early noun learning. However, the magnitude, development, and cross-cultural generality of this bias remain debated. We conducted a pre-registered meta-analysis and meta-regression of 71 studies to synthesize the evidence base. Our analysis revealed a robust overall effect, confirming the existence of a shape bias. However, this effect was characterized by extreme between-study heterogeneity (I² = 0.95). Critically, meta-regression analyses failed to support hypothesized developmental changes, with a constant model across ages providing the most parsimonious fit. The literature is overwhelmingly dominated by studies of English-speaking children, preventing meaningful tests of cross-linguistic or cross-cultural variation. We also found strong statistical evidence of publication bias, suggesting that the true effect size could be inflated in the published literature. Together, these findings indicate that procedural variation, besides a potential publication bias, more than currently testable theoretical moderators, account for the variability in the literature, severely limiting the ability to distinguish between theories of the shape bias's origins. 
+  The "shape bias"—the tendency to generalize new nouns by their shape rather than features like color or texture—is considered a cornerstone of early noun learning. However, the magnitude, development, and cross-cultural generality of this bias remain debated. We conducted a pre-registered meta-analysis and meta-regression of 71 studies to synthesize the evidence base. Our analysis revealed a robust overall effect, confirming the existence of a shape bias. However, this effect was characterized by extreme between-study heterogeneity (I² = 0.95). Critically, meta-regression analyses failed to support hypothesized developmental changes, with a constant model across ages providing the most parsimonious fit. The literature is overwhelmingly dominated by studies of English-speaking children, preventing meaningful tests of cross-linguistic or cross-cultural variation. We also found strong statistical evidence of publication bias, suggesting that the true effect size could be inflated in the published literature. Together, these findings indicate that procedural variation, beside a potential publication bias, more than currently testable theoretical moderators, account for the variability in the literature, severely limiting the ability to distinguish between theories of the shape bias's origins. 
   
 keywords          : "Shape bias; Word learning; Developmental change; Cross-cultural differences; Meta analysis; Publication bias; Statistical over-generalization"
 wordcount         : "3930"
@@ -174,18 +173,6 @@ df_shape <- df_shape |>
   filter(!is.na(d), !is.na(indoeuropean), !is.na(mean_age_months_centered36))
 
 df_shape <- df_shape %>% mutate(index = 1:length(d))
-```
-
-```{r eval=FALSE, echo=FALSE, include=FALSE}
-# how many studies per language in a plot 
-df_shape %>%
-  group_by(language) %>%
-  summarize(count = n()) %>%
-  ggplot(aes(x=reorder(language, -count), y=count)) +
-  geom_bar(stat="identity") +
-  theme_minimal() +
-  labs(x="Language", y="Number of effect sizes") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r include=FALSE}
@@ -499,25 +486,6 @@ ggplot(df_shape_solid,
   theme_minimal() + 
   theme(legend.position = "bottom")
 
-ggsave("figs/dev_change_lang.png", width = 6, height = 4, units = "in", dpi = 300)
-
-# ggplot(df_shape_solid, aes(x = mean_age_months, y = d, color = language)) +
-#   geom_pointrange(aes(ymin = d - d_var, ymax = d + d_var), alpha = .5, size = 0.1) +
-#   geom_line(data = merged, aes(y = pred), group = 1, col = "black") +
-#   geom_ribbon(
-#     data = merged,
-#     aes(x = mean_age_months, ymin = pred - ci.lb, ymax = pred + ci.ub), # Add x aesthetic here
-#     fill = "darkgray",
-#     alpha = 0.2,
-#     inherit.aes = FALSE
-#   ) +
-#   geom_hline(yintercept = 0, lty = 3) +
-#   ylab("Standardized Mean Difference (d)") +
-#   xlab("Mean age (months)") +
-#   scale_color_discrete(name = "Language") +
-#   facet_wrap(~indoeuropean) +
-#   theme_minimal() +
-#   theme(legend.position = "bottom")
 
 ```
 
